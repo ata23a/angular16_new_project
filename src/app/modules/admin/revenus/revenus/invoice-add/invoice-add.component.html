@@ -1,0 +1,64 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="flex-auto p-6 sm:p-10">
+        <div class="h-400  min-h-400 max-h-400 ">
+            <mat-card class="example-card">
+                <mat-card-header>
+                    <!--<div mat-card-avatar class="example-header-image"></div>-->
+                    <mat-card-title><h4 class="text-xl font-sans text-blue-600">Nouvelle facture</h4></mat-card-title>
+                    <hr class="">
+
+                    <!--<mat-card-subtitle>Dog Breed</mat-card-subtitle>-->
+                </mat-card-header>
+                <form class="example-form">
+                    <label class="ml-2"> client: &nbsp;&nbsp;&nbsp;</label>
+                    <mat-form-field appearance="outline" class="example-full-width">
+                        <mat-label>Search client</mat-label>
+                        <input matInput type="text" [formControl]="searchControl" [placeholder]="'Taper ici ...'" [matAutocomplete]="auto" (input)="searchContact(searchControl.value)">
+                        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onSelectContact($event)">
+                            <mat-option *ngFor="let result of searchResults" [value]="result.name">
+                                {{ result.name }} - {{ result.phone }}
+                                <a class="d-block text-white py-2" *ngIf="searchResults.length === 0">
+                                    <!--<i class="fa fa-plus-circle" style="color:white;"></i>-->
+                                    Add new Contact
+                                </a>
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                    <label class="ml-2"> Tél: &nbsp;&nbsp;&nbsp;</label>
+                    <input matInput type="text" readonly [value]="selectedTel" [placeholder]="'Num phone'">
+                </form>
+
+                <div class="input-icon" *ngIf="value && display && display !== ''">
+                    <i class="{{loading ? 'fa fa-spin fa-spinner' : 'ti-close'}} pointer" title="Clear"
+                       (click)="clear()" [hidden]="readOnly"
+                    ></i>
+                    <input class="form-control {{inputClass}}" [(ngModel)]="display" [readOnly]="readOnly" #inputDisplay>
+                </div>
+
+
+                <mat-card-content>
+
+                </mat-card-content>
+
+
+
+                <mat-card-actions>
+
+                </mat-card-actions>
+            </mat-card>
+
+        </div>
+    </div>
+</div>
+<ng-template #tpl let-r="result" let-t="term">
+    <ngb-highlight [result]="r?.name" [term]="t"></ngb-highlight>
+
+    <span style="color: #6f748a;" [ngClass]="{ 'd-block': r, 'd-none': !r }">
+    {{r?.phone}} - {{r?.email}}
+  </span>
+
+    <a class="d-block text-white py-2" *ngIf="!r">
+        <!--<i class="fa fa-plus-circle" style="color:white;"></i>-->
+        Add new Contact
+    </a>
+</ng-template>
