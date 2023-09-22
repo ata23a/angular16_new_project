@@ -4,20 +4,34 @@ import {MatTableModule} from "@angular/material/table";
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {JwtInterceptor} from "./core/interceptor/jwt-interceptor";
+import {MatSnackBarModule} from "@angular/material/snack-bar";
+import { TypeheadContactComponent } from './modules/admin/revnus/invoice-add/typehead-contact/typehead-contact.component';
+import {FormsModule} from "@angular/forms";
+import {NgbHighlight, NgbTypeahead} from "@ng-bootstrap/ng-bootstrap";
+import {CommonModule, NgClass} from "@angular/common";
 
 @NgModule({
   declarations: [
     IncomeSearchComponent,
+    TypeheadContactComponent,
   ],
     imports: [
         HttpClientModule,
         MatTableModule,
-        MatPaginatorModule
+        MatPaginatorModule,
+        MatSnackBarModule,
+        FormsModule,
+        NgbTypeahead,
+        NgbHighlight,
+        NgClass,
+        CommonModule
     ],
-    exports: [
-        IncomeSearchComponent,
-    ],
+  exports: [
+    IncomeSearchComponent,
+    TypeheadContactComponent,
+  ],
     providers: [
+      MatSnackBarModule,
         {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     ],
 })

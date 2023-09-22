@@ -19,7 +19,6 @@ export const authInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn):
 {
 
     const authService = inject(AuthentificationService);
-    console.log('Intercepteur JWT est appelé');
     let newReq = req.clone();
 
     const token = authService.accessToken;

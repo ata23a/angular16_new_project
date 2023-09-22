@@ -1,52 +1,253 @@
 <div class="flex flex-col flex-auto min-w-0">
     <div class="flex-auto p-6 sm:p-10">
         <div class="h-400  min-h-400 max-h-400 ">
-            <mat-card class="example-card">
-                <mat-card-header>
-                    <!--<div mat-card-avatar class="example-header-image"></div>-->
-                    <mat-card-title><h4 class="text-xl font-sans text-blue-600">Nouvelle facture</h4></mat-card-title>
-                    <hr class="">
+            <form class="example-form" [formGroup]="addInvoiceForm" autocomplete="off" novalidate (ngSubmit)="save()">
+                <mat-card class="example-card">
+                    <mat-card-header>
+                        <!--<div mat-card-avatar class="example-header-image"></div>-->
+                        <mat-card-title><h4 class="text-xl font-sans text-blue-600">Nouvelle facture</h4>
+                        </mat-card-title>
+                        <hr class="">
 
-                    <!--<mat-card-subtitle>Dog Breed</mat-card-subtitle>-->
-                </mat-card-header>
-                <form class="example-form">
-                    <label class="ml-2"> client: &nbsp;&nbsp;&nbsp;</label>
+                        <!--<mat-card-subtitle>Dog Breed</mat-card-subtitle>-->
+                    </mat-card-header>
+                    <hr />
+                    <!--<label class="ml-2"> client: &nbsp;&nbsp;&nbsp;</label>
                     <mat-form-field appearance="outline" class="example-full-width">
                         <mat-label>Search client</mat-label>
-                        <input matInput type="text" [formControl]="searchControl" [placeholder]="'Taper ici ...'" [matAutocomplete]="auto" (input)="searchContact(searchControl.value)">
-                        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onSelectContact($event)">
+                        <input matInput type="text" [formControl]="searchControl" [placeholder]="'Taper ici ...'"
+                               [matAutocomplete]="auto" (input)="searchContact(searchControl.value)">
+                        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn"
+                                          (optionSelected)="onSelectContact($event)">
                             <mat-option *ngFor="let result of searchResults" [value]="result.name">
                                 {{ result.name }} - {{ result.phone }}
                                 <a class="d-block text-white py-2" *ngIf="searchResults.length === 0">
-                                    <!--<i class="fa fa-plus-circle" style="color:white;"></i>-->
+                                    &lt;!&ndash;<i class="fa fa-plus-circle" style="color:white;"></i>&ndash;&gt;
                                     Add new Contact
                                 </a>
                             </mat-option>
                         </mat-autocomplete>
                     </mat-form-field>
-                    <label class="ml-2"> Tél: &nbsp;&nbsp;&nbsp;</label>
-                    <input matInput type="text" readonly [value]="selectedTel" [placeholder]="'Num phone'">
-                </form>
+                    <label class="offset-lg-1 col-lg-3 col-form-label text-lg-right">N° Facture</label>
 
-                <div class="input-icon" *ngIf="value && display && display !== ''">
-                    <i class="{{loading ? 'fa fa-spin fa-spinner' : 'ti-close'}} pointer" title="Clear"
-                       (click)="clear()" [hidden]="readOnly"
-                    ></i>
-                    <input class="form-control {{inputClass}}" [(ngModel)]="display" [readOnly]="readOnly" #inputDisplay>
-                </div>
+                    <div class=" col-lg-3">
+                        <div class="form-group">
+                            <input type="text" class="form-control bg-transparent" formControlName="invoice_number"
+                                   [readOnly]="true"
+                                   [class.error]="submitted && addInvoiceForm.get('invoice_number').status === 'INVALID'">
+                        </div>
+                    </div>-->
+                    <div class="row">
+                        <label class="col-lg-2 col-form-label text-lg-right">Client</label>
+
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <app-typehead-contact formControlName="contact" [(phoneselected)]="phoneselected" [submitted]="submitted" required></app-typehead-contact>
+                            </div>
+                            <div *ngIf="submitted && addInvoiceForm.get('contact').invalid" class="text-danger">
+                                Client est requis.
+                            </div>
+                        </div>
+
+                        <label class="offset-lg-1 col-lg-3 col-form-label text-lg-right">N° Facture</label>
+
+                        <div class=" col-lg-3">
+                            <div class="form-group">
+                                <input type="text" class="form-control bg-transparent" formControlName="invoice_number"
+                                       [readOnly]="true">
+                            </div>
+                            <div *ngIf="submitted && addInvoiceForm.get('invoice_number').invalid" class="text-danger">
+                                N° Facture est requis.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col col-form-label text-lg-right">Tél.</label>
+
+                        <label class="col-lg-3 col-form-label">{{phoneselected}}</label>
+
+                        <label class="offset-lg-1 col-lg-3 col-form-label text-lg-right">Facturé le</label>
+
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="timepicker-input input-icon">
+                                    <i class="ti-time"></i>
+                                    <input type="date" class="form-control" formControlName="invoiced_at" >
+                                </div>
+                                <div *ngIf="submitted && addInvoiceForm.get('invoiced_at').invalid" class="text-danger">
+                                    Date de Facture est requis.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col col-form-label text-lg-right">Catégorie</label>
+
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <mat-form-field class="w-90" appearance="fill">
+                                    <mat-select class="w-90" formControlName="category">
+                                        <mat-option class="w-90" *ngFor="let category of categories | async" [value]="category">
+                                            {{ category.name }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <div *ngIf="submitted && addInvoiceForm.get('category').invalid" class="text-danger">
+                                    Catégorie est requise.
+                                </div>
+                            </div>
+                        </div>
+
+                        <label class="offset-lg-1 col-lg-3 col-form-label text-lg-right">Date d'échéance</label>
+
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="timepicker-input input-icon">
+                                    <i class="ti-time"></i>
+                                    <input type="date" class="form-control" formControlName="due_at">
+                                </div>
+                                <div *ngIf="submitted && addInvoiceForm.get('due_at').invalid" class="text-danger">
+                                    Date d'échéance est requise.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div formArrayName="InvoiceItems">
+                                <div class="form-group m-0">
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <label>Produits/services</label>
+                                        <!--<button type="button" title="ajout produit/service"
+                                                class="bg-transparent hover:bg-blue-500 text-blue-700
+                                                font-semibold hover:text-white py-2 px-4 border
+                                                border-blue-500 hover:border-transparent rounded w-15 h-8" (click)="addItem()">
+                                            <mat-icon svgIcon="heroicons_solid:plus"></mat-icon>
+                                        </button>-->
+                                    </div>
+                                    <table class="table table-bordered table-item">
+                                        <thead>
+                                        <tr class="font-weight-bold bg-light">
+                                            <th class="text-center" style="width:7%;">
+                                                <mat-icon svgIcon="feather:align-justify"></mat-icon>
+                                            </th>
+                                            <th>Nom</th>
+                                            <th class="width-10 text-center">Unité</th>
+                                            <th class="width-10 text-center">Quantité</th>
+                                            <th class="width-15 text-right">Prix unitaire</th>
+                                            <th class="width-20">Taxes</th>
+                                            <th class="width-15 text-right">Total</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr *ngFor="let item of InvoiceItems.controls; let i=index" [formGroupName]="i">
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-link m-0" (click)="removeItem(i)">
+                                                    <mat-icon svgIcon="heroicons_outline:archive-box"></mat-icon>
+                                                </button>
+                                            </td>
+                                            <td class="relative">
+                                                <mat-form-field class="w-50" appearance="fill">
+                                                    <mat-select placeholder="Choisissez l'article..." formControlName="item" [formControl]="itemControl" (selectionChange)="onSelectItem($event, item)">
+                                                        <mat-option *ngFor="let item of items" [value]="item">
+                                                            {{ item.name }}
+                                                            <ng-container *ngIf="item.type !== 'SERVICES'">
+                                                                <span style="color: #ff6879!important" class="font-weight-bold d-block font-size-13"
+                                                                  *ngIf="!item.available?.quantity"><i class="fa fa-exclamation-triangle"></i>&nbsp;&nbsp;Stock épuisé</span>
+                                                                <span class="d-block font-size-13 text-muted" *ngIf="item.available?.quantity">
+                                                                  {{ item.available.quantity }} {{ item.available.ItemUnit?.name || 'UNITE' }}(S)
+                                                                </span>
+                                                            </ng-container>
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+
+                                                <button type="button" class="btn btn-link m-0" data-toggle="collapse" [attr.data-target]="'#collapse-' + i"
+                                                        style="position: absolute; top: 0; right: 0;">
+                                                    <i class="fa fa-pencil text-dark"></i>
+                                                </button>
+
+                                                <div class="collapse" id="collapse-{{i}}" >
+                                                    <textarea class="form-control no-border" formControlName="description" placeholder="Entrer description"></textarea>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <ng-select class="no-border" placeholder="Choisir..." formControlName="unit_id"
+                                                           [items]="item.controls.units?.value" bindLabel="name" bindValue="id"
+                                                           [hideSelected]="true" [clearable]="false" (change)="onSelectUnit($event, item)">
+                                                </ng-select>
+                                            </td>
+                                            <td>
+                                                <input type="number" formControlName="quantity" class="form-control text-center"
+                                                       [min]="1">
+                                            </td>
+                                            <td>
+                                                <input type="text" formControlName="price" class="form-control text-right"
+                                                       mask="separator">
+                                            </td>
+                                            <td>
+                                                <mat-form-field appearance="fill" class="w-50">
+                                                    <mat-select  placeholder="Sélectionnez des taxes" formControlName="Taxes" multiple>
+                                                        <mat-option *ngFor="let tax of taxes | async" [value]="tax.name">{{ tax.name }}</mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </td>
+                                            <td class="text-right">
+                                                <input type="text" class="form-control text-right bg-transparent" readonly
+                                                       [value]="getTotal(item) | currency:'MGA':''">
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <button type="button" class="btn btn-link" (click)="addItem()">
+                                Ajouter produit/service
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="offset-8 col-lg-4">
+                            <div class="list-group">
+                                <div class="list-group-item">
+                                    <b class="width-50 inline-block text-right mrg-right-15">Sous-total</b>
+                                    <span class="pull-right">{{getPaymentDue() | currency:'MGA':''}}</span>
+                                </div>
+                                <div class="list-group-item">
+                                    <b class="width-50 inline-block text-right mrg-right-15">Taxes</b>
+                                    <span class="pull-right">{{getTotalTax() | currency:'MGA':''}}</span>
+                                </div>
+                                <div class="list-group-item">
+                                    <b class="width-50 inline-block text-right mrg-right-15">Remise</b>
+                                    <span class="pull-right">{{getTotalDiscount() | currency:'MGA':''}}</span>
+                                </div>
+                                <div class="list-group-item">
+                                    <b class="width-50 inline-block text-right mrg-right-15">Total</b>
+                                    <span class="pull-right font-weight-bold">{{getBalance() | currency:'MGA':'Ar '}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <mat-card-content>
+
+                    </mat-card-content>
 
 
-                <mat-card-content>
-
-                </mat-card-content>
-
-
-
-                <mat-card-actions>
-
-                </mat-card-actions>
-            </mat-card>
-
+                    <mat-card-actions>
+                        <div class="card-footer border top text-right pdd-vertical-15 pdd-horizon-30">
+                            <button type="submit" class="btn btn-info m-0" appXhrBtnIndicator>
+                                <mat-icon svgIcon="feather:save"></mat-icon></button>
+                        </div>
+                    </mat-card-actions>
+                </mat-card>
+            </form>
         </div>
     </div>
 </div>
@@ -58,7 +259,6 @@
   </span>
 
     <a class="d-block text-white py-2" *ngIf="!r">
-        <!--<i class="fa fa-plus-circle" style="color:white;"></i>-->
         Add new Contact
     </a>
 </ng-template>

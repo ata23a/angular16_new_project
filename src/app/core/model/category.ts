@@ -1,4 +1,4 @@
-export class Category {
+class Category {
   id?: number;
   company_id?: number;
   code?: number;
@@ -15,7 +15,3 @@ export class Category {
 }
 
 export default Category;
-
-/*
-export class Category {
-}*/

@@ -1,8 +1,8 @@
-/*import Tax from './tax';
+import Tax from './tax';
 import RoomType from './room-type';
 import Reservation from './reservation';
 import Request from './request';
-import Facility from './facility';*/
+import Facility from './facility';
 
 class Room {
   id?: number;
@@ -19,12 +19,12 @@ class Room {
   is_available?: boolean;
   enabled?: boolean;
   active?: boolean;
-/*  Tax?: Tax;
+  Tax?: Tax;
   RoomType?: RoomType;
   Histories?: any[];
   Requests?: Request[];
   Facility?: Facility;
-  Reservations?: Reservation[]*/
+  Reservations?: Reservation[]
 
   constructor(args = {}) {
     for (const key of Object.keys(args)) {

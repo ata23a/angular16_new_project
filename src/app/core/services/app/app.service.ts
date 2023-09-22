@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import moment from "moment";
 
 @Injectable({
   providedIn: 'root'
@@ -12,4 +13,7 @@ export class AppService {
     public static get API() {
         return localStorage.getItem('API');
     }
+  getInvoiceCode = () => {
+    return 'INV-' + moment().valueOf();
+  }
 }

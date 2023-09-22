@@ -7,12 +7,12 @@ export class NotificationService {
 
   constructor() { }
     error(title, content) {
-        const isObject = content ? content.hasOwnProperty('message') : false;
+        /*const isObject = content ? content.hasOwnProperty('message') : false;
         let message = isObject ? content.message : content;
 
-        if (/.*UNIQUE_CONSTRAINT_ERROR.*/.test(message)) {
+        if (/.*UNIQUE_CONSTRAINT_ERROR.*!/.test(message)) {
             message = content.error.toUpperCase() + '_NOT_UNIQUE';
-        }
+        }*/
 
         /*this.toastOptions.title = this.translateMessage(title || 'ERROR');
         this.toastOptions.msg = this.translateMessage(message, 'ERROR');
