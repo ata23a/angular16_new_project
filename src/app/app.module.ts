@@ -9,11 +9,13 @@ import { TypeheadContactComponent } from './modules/admin/revnus/invoice-add/typ
 import {FormsModule} from "@angular/forms";
 import {NgbHighlight, NgbTypeahead} from "@ng-bootstrap/ng-bootstrap";
 import {CommonModule, NgClass} from "@angular/common";
+import { InvoiceListComponent } from './modules/admin/revenus/revenus/invoice-list/invoice-list.component';
 
 @NgModule({
   declarations: [
     IncomeSearchComponent,
     TypeheadContactComponent,
+    InvoiceListComponent,
   ],
     imports: [
         HttpClientModule,
@@ -24,7 +26,7 @@ import {CommonModule, NgClass} from "@angular/common";
         NgbTypeahead,
         NgbHighlight,
         NgClass,
-        CommonModule
+        CommonModule,
     ],
   exports: [
     IncomeSearchComponent,

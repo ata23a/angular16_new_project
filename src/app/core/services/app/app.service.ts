@@ -7,6 +7,8 @@ import moment from "moment";
 export class AppService {
 
   constructor() { }
+
+    public static DEFAULT_CURRENCY = 'MGA';
     public static set API(value: string) {
         localStorage.setItem('API', value);
     };
