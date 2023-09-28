@@ -1,0 +1,19 @@
+<div class="modal-content">
+    <div class="modal-header border-bottom pb-3 btn-{{type}}">
+    <span class="modal-title font-size-16">
+      <i class="fa fa-exclamation-triangle mr-2"></i>
+      <span [innerHTML]="title || 'En attente de confirmation'"></span>
+    </span>
+        <button type="button" class="close" mat-dialog-close  aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body text-center">
+        <h4 class="mb-0" [innerHTML]="text || ('Etes vous sur' + '?')"></h4>
+    </div>
+    <hr>
+    <div class="modal-footer">
+        <button class="btn mr-1" mat-dialog-close translate>Non</button>
+        <button class="btn btn-info" (click)="ajout()" translate>Oui</button>
+    </div>
+</div>
