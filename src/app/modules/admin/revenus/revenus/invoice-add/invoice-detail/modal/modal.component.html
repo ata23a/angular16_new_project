@@ -1,0 +1,103 @@
+<h4 class="card-title text-info mb-2" *ngIf="!selected">Ajouter article</h4>
+<h4 class="card-title text-info mb-2" *ngIf="selected">Modifier article</h4>
+<hr>
+<form (submit)="save()" novalidate [formGroup]="form">
+    <div class="modal-body">
+        <div class="form-group">
+            <label class="block mb-2 text-sm font-medium dark:text-white">Nom</label>
+            <mat-form-field class="w-100">
+                <input matInput [readonly]="selected" [matAutocomplete]="auto" formControlName="item"
+                       [(ngModel)]="selected" placeholder="tapez pour chercher..." [formControl]="itemControl">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                    <mat-option *ngFor="let item of filteredOptions | async" [value]="item"
+                                (onSelectionChange)="onSelectItem2($event)">
+                        {{ item.name }}
+                        <ng-container *ngIf="selected === item">
+                            <span>{{ item.name }}</span>
+                        </ng-container>
+                        <ng-container *ngIf="item.type !== 'SERVICES'">
+                            <span style="color: #ff6879!important" class="font-weight-bold d-block font-size-13"
+                                  *ngIf="!item.available?.quantity"><mat-icon
+                                svgIcon="heroicons_outline:shield-exclamation"></mat-icon>Stock épuisé</span>
+                            <span class="d-block font-size-13 text-muted" *ngIf="item.available?.quantity">
+                                {{ item.available.quantity }} {{ item.available.ItemUnit?.name || 'UNITE' }}(S)
+                            </span>
+                        </ng-container>
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <div class="form-group">
+            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+            <textarea class="form-control" #descriptionField formControlName="description"></textarea>
+        </div>
+        <div class="row">
+            <div class="col-md-4 form-group">
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Unité</label>
+                <mat-select class="h-9 border-1 rounded-2" placeholder="{{ selected ? 'Unité' : 'Choisir...' }}"
+                            formControlName="unit_id" (selectionChange)="onSelectUnit($event)"
+                            [ngClass]="{'error': submitted && form.controls.unit_id.invalid}">
+                    <mat-option *ngFor="let unit of (selected ? units : form.controls.units?.value || [])"
+                                [value]="unit.id">{{ unit.name }}</mat-option>
+                </mat-select>
+            </div>
+            <div class="col-md-4 form-group">
+                <label>Quantité</label>
+                <input type="number" formControlName="quantity" [readonly]="selected" class="form-control" [min]="1"
+                       [class.error]="submitted && form.controls.quantity.invalid">
+            </div>
+            <div class="col-md-4 form-group">
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Prix unitaire</label>
+                <input type="number" formControlName="price" class="form-control" [readonly]="selected" [min]="0"
+                       [class.error]="submitted && form.controls.quantity.invalid">
+            </div>
+        </div>
+        <div class="row" *ngIf="hasTaxes">
+            <div class="col-md-12 form-group">
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Taxes</label>
+                <mat-select class=" h-9 border-1 rounded-2" placeholder="Ajouter taxe" formControlName="Taxes"
+                            [multiple]="true">
+                    <mat-select-trigger>
+                        {{ form.get('Taxes').value ? form.get('Taxes').value.length + ' taxes selected' : 'Ajouter taxe' }}
+                    </mat-select-trigger>
+                    <mat-option *ngFor="let tax of taxes$ | async" [value]="tax.name">{{ tax.name }}</mat-option>
+                </mat-select>
+            </div>
+        </div>
+        <div class="row" *ngIf="type === 'HEALTH'" formGroupName="meta">
+            <div class="col-md-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Posologie</label>
+                <input type="text" formControlName="dosage" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Voie</label>
+                <ng-select [searchable]="false" [items]="modes" [clearable]="false"
+                           formControlName="administration_mode">
+                </ng-select>
+            </div>
+            <div class="col-md-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Durée</label>
+                <div class="input-group">
+                    <input type="text" formControlName="duration" class="form-control">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text font-size-14">jour(s)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="modal-footer justify-content-between mt-5">
+        <div>
+            <h5 class="mb-0">Total: <b>{{form.controls.total.value }}</b></h5>
+        </div>
+        <div>
+            <button type="button" class="btn btn-danger mr-2" (click)="removeItem()"
+                    [hidden]="!selected">
+                SUPPRIMER
+            </button>
+            <button class="btn btn-info" *ngIf="!selected">AJOUTER</button>
+            <button class="btn btn-info" *ngIf="selected">MODIFIER</button>
+        </div>
+    </div>
+</form>
