@@ -1,1 +1,28 @@
-<p>income-search works!</p>
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="flex-auto p-6 sm:p-10">
+        <div class="h-400  min-h-400 max-h-400 bg-card">
+            <div class="row justify-content-center mt-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <form role="form" [formGroup]="searchForm" (ngSubmit)="search()">
+                                <div class="form-group mb-0">
+                                    <label for="term" class="d-block">RECHERCHER FACTURE PAR ID</label>
+                                    <div class="input-group">
+                                        <input type="search" id="term" class="form-control" placeholder="ID facture" formControlName="term"
+                                               [class.error]="submitted && searchForm.get('term').status === 'INVALID'">
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-info mr-0" appXhrBtnIndicator>
+                                                <mat-icon>search</mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -19,6 +19,15 @@ export class NotificationService {
 
         this.toastyService.error(this.toastOptions);*/
     }
+    info(title, message) {
+        /*title = this.translateMessage(title || 'INFO');
+        message = this.translateMessage(message);
+
+        this.toastOptions.title = title;
+        this.toastOptions.msg = message;
+
+        this.toastyService.info(this.toastOptions);*/
+    }
     success(title, message) {
         /*title = this.translateMessage(title || 'SUCCESS');
         message = this.translateMessage(message);

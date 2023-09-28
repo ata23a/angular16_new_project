@@ -123,7 +123,31 @@ export const appRoutes: Route[] = [
             initialData: initialDataResolver
         },
         children: [
-            {path: 'invoiceDetail', loadChildren: () => import('app/modules/admin/revenus/revenus/invoice-add/invoice-detail/invoice-detail.routes')},
+            {path: 'invoiceDetail/:id', loadChildren: () => import('app/modules/admin/revenus/revenus/invoice-add/invoice-detail/invoice-detail.routes')},
+        ]
+    },
+    {
+        path: '',
+        canActivate: [AuthGuard],
+        canActivateChild: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: initialDataResolver
+        },
+        children: [
+            {path: 'invoiceList', loadChildren: () => import('app/modules/admin/revenus/revenus/invoice-list/invoice-list.routes')},
+        ]
+    },
+    {
+        path: '',
+        canActivate: [AuthGuard],
+        canActivateChild: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: initialDataResolver
+        },
+        children: [
+            {path: 'invoiceSearch', loadChildren: () => import('app/modules/admin/revenus/search/income-search/income-search.routes')},
         ]
     }
 ];

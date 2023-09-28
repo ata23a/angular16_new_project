@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {map} from "rxjs";
+import {map, Observable, throwError} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {Item, ItemInventory, ItemUnit} from "../../model/item";
 import {environment} from "../../../../environments/environment";
@@ -16,6 +16,10 @@ export class IventoryService {
     getItemUnits(): Promise<ItemUnit[]> {
         const url = [environment.apiUrl, 'inventory/units'].join('/');
         return this.http.get<ItemUnit[]>(url).toPromise();
+    }
+    getItemUnits2(): Observable<Array<ItemUnit>> {
+        const url = [environment.apiPascoma, 'inventory/units'].join('/');
+        return this.http.get<Array<ItemUnit>>(url);
     }
   getDefaultRoomId = () => {
     const settings = JSON.parse(sessionStorage.getItem(SettingsCompanyService.KEY));
@@ -116,4 +120,25 @@ export class IventoryService {
 
         return 0;
     };
+    selectByRoom(term: string, room_id: number, items?: Item[]) {
+        const url = [environment.apiPascoma, 'inventory', 'room', room_id, 'select', term].join('/');
+        return this.http.get<ItemInventory[]>(url)
+            .pipe(
+                map(inventories => {
+                    if (items) {
+                        this.mapInventoriesToItems(inventories, items);
+                    }
+                    return inventories;
+                })
+            );
+    }
+    selectByDefaultRoom(term: string, items?: Item[]) {
+        const roomId = this.getDefaultRoomId();
+        if (roomId) {
+            return this.selectByRoom(term, roomId, items);
+        }
+        else {
+            return throwError({error: 'DEFAULT_ROOM_NOT_FOUND'});
+        }
+    }
 }

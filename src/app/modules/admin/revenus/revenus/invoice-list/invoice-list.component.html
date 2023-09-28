@@ -1,1 +1,92 @@
-<p>invoice-list works!</p>
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="flex-auto p-6 sm:p-10">
+        <div class="h-400  min-h-400 max-h-400 bg-card">
+             <form [formGroup]="dateForm" (submit)="getSummary()">
+                  <div class="mrg-btm-15 border-radius-4 border-white border-danger">
+                        <div class="row">
+                                    <mat-form-field color="accent" class="mr-5 w-90">
+                                        <input matInput [matDatepicker]="picker1" class="form-control input-sm bg-white" formControlName="start">
+                                        <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+                                        <mat-datepicker #picker1 color="primary"></mat-datepicker>
+                                    </mat-form-field>
+                                    <mat-form-field color="accent" class="mr-10 w-90">
+                                        <input matInput [matDatepicker]="picker2" class="form-control input-sm bg-white w-48 mr-15" formControlName="end">
+                                        <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                                        <mat-datepicker #picker2 color="primary"></mat-datepicker>
+                                    </mat-form-field>
+                                    <button class="mat-elevation-z0 mr-1 " mat-mini-fab color="primary" type="submit" aria-label="Example icon button with a filter list icon">
+                                        <mat-icon>search</mat-icon>
+                                    </button>
+                                    <button class="mat-elevation-z0 mr-1 " mat-mini-fab color="primary" aria-label="Example icon button with a filter list icon" (click)="resetForm()">
+                                        <mat-icon>refresh</mat-icon>
+                                    </button>
+                        </div>
+                  </div>
+             </form>
+            <div class="flex justify-between">
+                <div class="form-group m-0 row">
+
+                    <input placeholder="Recherche..." matInput
+                           [(ngModel)]="searchDescription"
+                           type="search" name="userQuestion" id="userQuestions" class="form-control w-100 input-sm"
+                           (ngModelChange)="this.searchDescriptionUpdate.next($event)"
+                    >
+                </div>
+                <button class="btn btn-sm btn-info mr-0 pull-right" routerLink="/invoiceAdd">Créer
+                    facture
+                </button>
+            </div>
+
+            <div class="mat-elevation-z8">
+                <table mat-table [dataSource]="data" matSort #sort="matSort">
+
+                    <!-- ID Column -->
+                    <ng-container matColumnDef="Numero">
+                        <th mat-header-cell *matHeaderCellDef > N: </th>
+                        <td mat-cell *matCellDef="let row"><a href [routerLink]="['/invoiceDetail', row.id]">{{row.id}}</a> </td>
+                    </ng-container>
+
+                    <!-- Progress Column -->
+                    <ng-container matColumnDef="contact">
+                        <th mat-header-cell *matHeaderCellDef> Contact </th>
+                        <td mat-cell *matCellDef="let row"> {{row.contact_name}} </td>
+                    </ng-container>
+
+                    <!-- Name Column -->
+                    <ng-container matColumnDef="reservation">
+                        <th mat-header-cell *matHeaderCellDef> Reservation </th>
+                        <td mat-cell *matCellDef="let row"> {{row.Reservation}} </td>
+                    </ng-container>
+
+                    <!-- Fruit Column -->
+                    <ng-container matColumnDef="categorie">
+                        <th mat-header-cell *matHeaderCellDef> Categorie </th>
+                        <td mat-cell *matCellDef="let row"> {{row.Category.name}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="total">
+                        <th mat-header-cell *matHeaderCellDef> Total </th>
+                        <td mat-cell *matCellDef="let row"> {{row.amount}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="impaye">
+                        <th mat-header-cell *matHeaderCellDef> Impayée </th>
+                        <td mat-cell *matCellDef="let row"> {{row.balance}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="date_facture">
+                        <th mat-header-cell *matHeaderCellDef> Facturée le </th>
+                        <td mat-cell *matCellDef="let row"> {{row.invoiced_at | date: 'dd/MM/yyyy HH:mm'}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="creer_le">
+                        <th mat-header-cell *matHeaderCellDef> Créer le </th>
+                        <td mat-cell *matCellDef="let row"> {{row.created_at | date: 'dd/MM/yyyy HH:mm'}} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                </table>
+
+                <mat-paginator [length]="resultsLength" [pageSize]="size" aria-label="Select page of GitHub search results"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

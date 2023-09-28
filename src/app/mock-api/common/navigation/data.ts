@@ -14,7 +14,6 @@ export const defaultNavigation: FuseNavigationItem[] = [
         title: 'Revenus',
         type : 'collapsable',
         icon : 'heroicons_outline:banknotes',
-        //link : '/revenus',
         children: [
             {
                 id   : 'liste',
@@ -26,13 +25,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 id   : 'facturation',
                 title: 'Facturation',
                 type : 'basic',
-                link : '/invoiceAdd'
+                link : '/invoiceList'
             },
             {
                 id   : 'recherche',
                 title: 'Recherche',
                 type : 'basic',
-                link : ''
+                link : '/invoiceSearch'
             }
             ]
     },

@@ -25,15 +25,12 @@ export class ItemService {
         };
     }
 
-   /* paginate(tableState: TableState): Observable<any> {
-        const API = environment.api
-        const url = [API, 'incomes', 'paginate'].join('/');
-        return this.http.post<any>(url, tableState,);
-    }*/
-
     paginate(tableState: TableState): Observable<any> {
-        const API = environment;
-        const url = [API.apiUrl, 'incomes', 'paginate'].join('/');
+        const url = [environment.apiUrl, 'incomes', 'paginate'].join('/');
+        return this.http.post<any>(url, tableState);
+    }
+    paginate2(tableState: TableState): Observable<any> {
+        const url = [environment.apiPascoma, 'incomes', 'paginate'].join('/');
         return this.http.post<any>(url, tableState);
     }
 }

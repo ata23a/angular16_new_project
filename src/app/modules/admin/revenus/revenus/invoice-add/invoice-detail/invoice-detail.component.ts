@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, LOCALE_ID, OnDestroy, OnInit} from '@angular/core';
 import {InvoiceService} from "../../../../../../core/services/invoice/invoice.service";
 import {NotificationService} from "../../../../../../core/services/notifications/notification.service";
 import {InvoicePrintService} from "../../../../../../core/services/print/invoice-print.service";
@@ -6,18 +6,75 @@ import Invoice from "../../../../../../core/model/invoice";
 import _orderBy from 'lodash/orderBy';
 import _forEach from "lodash/forEach";
 import {AccountingService} from "../../../../../../core/services/accounting/accounting.service";
-import {FormArray, FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {SettingsCompanyService} from "../../../../../../core/services/settingsCompany/settings-company.service";
 import {SessionService} from "../../../../../../core/services/session/session.service";
+import {ActivatedRoute, Router, RouterLink} from "@angular/router";
+import {MatTabsModule} from "@angular/material/tabs";
+import {AppModule} from "../../../../../../app.module";
+import {NgSelectModule} from "@ng-select/ng-select";
+import {AsyncPipe, CurrencyPipe, NgClass, NgForOf, NgIf, NgStyle, registerLocaleData} from "@angular/common";
+import {map, Observable, Subscription} from "rxjs";
+import Category from "../../../../../../core/model/category";
+import {CategoryService} from "../../../../../../core/services/category/category.service";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatOptionModule} from "@angular/material/core";
+import {MatSelectModule} from "@angular/material/select";
+import {MatInputModule} from "@angular/material/input";
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {MatIconModule} from "@angular/material/icon";
+import {Item, ItemUnit} from "../../../../../../core/model/item";
+import {IventoryService} from "../../../../../../core/services/iventory/iventory.service";
+import {MatDialog} from "@angular/material/dialog";
+import {ModalComponent} from "./modal/modal.component";
+import Tax from "../../../../../../core/model/tax";
+import {TaxService} from "../../../../../../core/services/tax/tax.service";
+import {MatButtonModule} from "@angular/material/button";
+import {MatMenuModule} from "@angular/material/menu";
+import {MatListModule} from "@angular/material/list";
+import {Confirmable} from "../../../../../../core/shared/comfirmable/comfirmable.decorator";
+import moment from "moment";
+import {NgxMaskDirective, provideNgxMask} from "ngx-mask";
+import localeFr from '@angular/common/locales/fr';
+import {ComfirmModalComponent} from "./comfirm-modal/comfirm-modal.component";
+registerLocaleData(localeFr);
 
 
 @Component({
-  selector: 'app-invoice-detail',
-  standalone: true,
-  templateUrl: './invoice-detail.component.html',
-  styleUrls: ['./invoice-detail.component.scss']
+    selector: 'app-invoice-detail',
+    standalone: true,
+    templateUrl: './invoice-detail.component.html',
+    providers:[
+        provideNgxMask(),
+        { provide: LOCALE_ID, useValue: 'fr-FR'},
+    ],
+    imports: [
+        MatTabsModule,
+        ReactiveFormsModule,
+        AppModule,
+        RouterLink,
+        NgSelectModule,
+        NgIf,
+        NgClass,
+        AsyncPipe,
+        MatFormFieldModule,
+        MatOptionModule,
+        MatSelectModule,
+        NgForOf,
+        MatInputModule,
+        MatDatepickerModule,
+        MatIconModule,
+        CurrencyPipe,
+        NgStyle,
+        MatButtonModule,
+        MatMenuModule,
+        MatListModule,
+        NgxMaskDirective,
+    ],
+    styleUrls: ['./invoice-detail.component.scss']
 })
-export class InvoiceDetailComponent implements OnInit{
+export class InvoiceDetailComponent implements OnInit, OnDestroy{
+    subscription = new Subscription();
     invoice: Invoice;
     id;
     Total = {
@@ -30,6 +87,11 @@ export class InvoiceDetailComponent implements OnInit{
     };
     invoiceForm: FormGroup;
     submitted;
+    categories: Observable<Category[]>;
+    itemUnits: Array<ItemUnit>;
+    taxes: Array<Tax>;
+    items: Array<Item> = [];
+
     constructor(
         private invoiceService: InvoiceService,
         private notification: NotificationService,
@@ -37,16 +99,171 @@ export class InvoiceDetailComponent implements OnInit{
         private accountingService: AccountingService,
         private formBuilder: FormBuilder,
         private sessionService: SessionService,
-        private settingsCompanyService: SettingsCompanyService
+        private settingsCompanyService: SettingsCompanyService,
+        private activatedRoute: ActivatedRoute,
+        private categoryService: CategoryService,
+        private inventoryService: IventoryService,
+        private dialog: MatDialog,
+        private taxService: TaxService,
+        private router: Router
     ) {
     }
-
     ngOnInit() {
-        this.id = 16787
+        this.categories = this.categoryService.list({type: 'income'});
+        this.id = this.activatedRoute.snapshot.paramMap.get('id');
         this.getInvoice(this.id)
         this.initForm()
         this.getCompanyInfo()
+        this.getUnits();
+        this.getTaxes()
 
+    }
+    ngOnDestroy() {
+        this.subscription.unsubscribe();
+    }
+
+    openConfirm() {
+        const modalRef = this.dialog.open(ComfirmModalComponent, {
+            width: '300px'
+        });
+        modalRef.componentInstance.title = 'Annuler la facture';
+        modalRef.componentInstance.type = 'danger';
+        modalRef.afterClosed().subscribe(result => {
+            if (result) {
+                this.invoiceService.cancel(this.invoice)
+                    .toPromise()
+                    .then(res => {
+                        this.resetForm();
+                        this.notification.info(null, 'INVOICE_CANCELED');
+                    })
+                    .catch(err => this.notification.error(null, err.error));
+            }
+        });
+    }
+    @Confirmable({title: 'Confirmation',}, true)
+    duplicate(response?) {
+        if (response) {
+            const dateNow = moment();
+
+            if (this.invoice.InvoiceItems.length) {
+                this.invoice.InvoiceItems.forEach(invItem => {
+                    delete invItem.id;
+                    delete invItem.invoice_id;
+                });
+            }
+
+            const body = new Invoice(
+                Object.assign(
+                    {},
+                    this.invoice,
+                    {
+                        invoiced_at: dateNow.format(),
+                        due_at: dateNow.format()
+                    }
+                )
+            );
+
+            delete body.id;
+            delete body.InvoiceHistories;
+
+            this.invoiceService.createWithUnit(body).subscribe(res=>{
+                this.router.navigate(['invoiceDetail/', res.id]);
+            })
+            }else{
+            console.log('error')
+        }
+    }
+    getTotal(formGroup: FormGroup) {
+        const total = formGroup.controls.quantity.value * formGroup.controls.price.value;
+
+        formGroup.patchValue({total: total});
+
+        return total;
+    }
+    private getTaxes() {
+        this.taxService.list().pipe(
+            map(taxes => taxes.map(item => {
+                    item['disabled'] = true;
+                    return item;
+                })
+            )
+        ).subscribe(value => {
+            this.taxes = value
+        });
+    }
+    isNew = (item) => item.controls['state'] ? false : true;
+    private getUnits() {
+        this.inventoryService.getItemUnits2().subscribe(units=>{
+            this.itemUnits = units;
+        })
+    }
+    editItem(item: any) {
+        const dialogRef = this.dialog.open(ModalComponent, {
+            width: '500px',
+        });
+
+        const component: ModalComponent = dialogRef.componentInstance
+        component.items = this.items;
+        component.type = 'INVOICE';
+        component.hasTaxes = true;
+        component.selected = item;
+        dialogRef.afterClosed().subscribe(item => {
+            if (item) {
+                this.updateIndividualItem(item);
+            }
+        });
+    }
+    private updateIndividualItem(item: any) {
+        this.invoiceService.updateItemWithUnit(this.invoice.id, item.id, item).toPromise().then(() => {
+            this.resetForm();
+            this.notification.success(null, 'UPDATE_SUCCESS');
+        }).catch(err => {
+            this.notification.error(null, err.error);
+        });
+    }
+
+    openAppendModal() {
+        const dialogRef = this.dialog.open(ModalComponent, {
+            width: '500px', // Définissez la largeur de votre modal
+        });
+        const component: ModalComponent = dialogRef.componentInstance
+        component.type = 'INVOICE';
+        component.hasTaxes = true;
+        dialogRef.afterClosed().subscribe(item => {
+            if (item) {
+                this.saveIndividualItem(item);
+            }
+        });
+    }
+    private saveIndividualItem(item: any) {
+        item = {
+            ...item,
+            invoice_id: this.invoice.id
+        };
+
+        delete item.item;
+        delete item.units;
+
+        this.invoiceService.addItem(this.invoice.id, item).toPromise().then(() => {
+            this.resetForm();
+            this.notification.success(null, 'SAVE_SUCCESS');
+        }).catch(err => {
+            this.notification.error(null, err.error);
+        });
+    }
+    resetForm() {
+        this.invoice = null;
+        //this.submitted_history = false;
+        this.submitted = false;
+
+        //this.historyForm.reset();
+
+        while(this.InvoiceItems.length) {
+            this.InvoiceItems.removeAt(0);
+        }
+
+        this.invoiceForm.reset({invoice_number: {value: '', disabled: true}});
+        this.getInvoice(this.id);
     }
     private getCompanyInfo() {
         const id = this.sessionService.getActiveCompany().id;
@@ -150,7 +367,6 @@ export class InvoiceDetailComponent implements OnInit{
         this.invoiceService.get(id)
             .toPromise()
             .then(invoice => {
-                console.log(invoice)
                 this.invoice = invoice;
                 this.invoice.Revenues = _orderBy(invoice.Revenues, ['id'], ['desc']);
                 this.Total.discount = this.accountingService.getTotalDiscount(this.invoice.InvoiceItems);
@@ -174,30 +390,39 @@ export class InvoiceDetailComponent implements OnInit{
             });
     }
     print(type) {
-        const id = 16787
+        const id = this.invoice.id
         if (type === 'A4') {
-            this.invoiceService.invoicePrint(id)
-                .then(res => this.printService.invoice(this.invoice))
+            this.invoiceService.invoicePrint(id).subscribe(res=>{
+                console.log(res)
+                this.printService.invoice(this.invoice)
+            })
+                /*.then(res => this.printService.invoice(this.invoice))
                 .catch(err => {
+                    console.log(err)
                     this.notification.error(null, err.error)
-                });
+                });*/
         }
         else if (type === 'A4V2') {
-            this.invoiceService.invoicePrint(id)
-                .then(res => this.printService.invoiceV2(this.invoice))
+            this.invoiceService.invoicePrint(id).subscribe(res=>{
+                this.printService.invoiceV2(this.invoice)
+            })
+                /*.then(res => this.printService.invoiceV2(this.invoice))
                 .catch(err => {
                     this.notification.error(null, err.error)
-                });
+                });*/
         }
         else if (type === 'RECEIPT') {
             if (this.invoice.status !== 'PAID') {
                 this.notification.error(null, 'INVOICE_NOT_PAID');
             }
             else {
-                this.invoiceService.invoicePrint(id)
-                    .then(res => this.printService.receipt(this.invoice))
-                    .catch(err => this.notification.error(null, err.error));
+                this.invoiceService.invoicePrint(id).subscribe(res=>{
+                    this.printService.receipt(this.invoice)
+                })
+                    /*.then(res => this.printService.receipt(this.invoice))
+                    .catch(err => this.notification.error(null, err.error));*/
             }
         }
     }
+
 }

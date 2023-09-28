@@ -186,6 +186,7 @@ export class TypeheadContactComponent implements ControlValueAccessor, OnInit, O
                     return this.contactService.select(term)
                         .toPromise()
                         .then((res) => {
+                            console.log(res)
                             return res.length > 0 ? res : [null];
                         })
                         .catch((err) => this.notification.error(null, err.error))
