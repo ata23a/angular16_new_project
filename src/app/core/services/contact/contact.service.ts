@@ -1,19 +1,21 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import Contact from "../../model/contact";
-import {environment} from "../../../../environments/environment";
+import {AppService} from "../app/app.service";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class ContactService {
 
-  constructor(
-      private http : HttpClient
-  ) { }
+    constructor(
+        private http: HttpClient
+    ) {
+    }
+
     select(term: any): Observable<Contact[]> {
-        const url = [environment.apiUrl, 'contacts', term, 'select'].join('/');
+        const url = [AppService.API, 'contacts', term, 'select'].join('/');
         return this.http.get<Contact[]>(url);
     }
 }

@@ -1,20 +1,22 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import moment from "moment";
 import {FormGroup} from "@angular/forms";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class SessionService {
 
-  constructor() { }
+    constructor() {
+    }
+
     getToken = () => {
         return window.sessionStorage.getItem('token');
     };
-  getUser = () => {
-    const session = this.getSession();
-    return session ? session.user : null;
-  };
+    getUser = () => {
+        const session = this.getSession();
+        return session ? session.user : null;
+    };
 
     setDateForm(form: FormGroup, key: string, attribut: string): void {
         const session = sessionStorage.getItem(key);
@@ -41,29 +43,30 @@ export class SessionService {
             });
         }
     }
-  getSession() {
-    try {
-      const session = JSON.parse(sessionStorage.getItem('session'));
 
-      if (!session) {
-        // throw new Error('user disconnected!');
+    getSession() {
+        try {
+            const session = JSON.parse(sessionStorage.getItem('session'));
+
+            if (!session) {
+                // throw new Error('user disconnected!');
+                return {};
+            }
+
+            return session;
+        } catch (e) {
+            console.log(e);
+        }
+
         return {};
-      }
-
-      return session;
-    }
-    catch (e) {
-      console.log(e);
     }
 
-    return {};
-  }
-  getCompanyId = () => {
-    const company = this.getActiveCompany();
-    return company ? parseInt(company.id) : null;
-  }
-  getActiveCompany = () => {
-    const user = this.getUser();
-    return user ? user.activeCompany : null;
-  }
+    getCompanyId = () => {
+        const company = this.getActiveCompany();
+        return company ? parseInt(company.id) : null;
+    }
+    getActiveCompany = () => {
+        const user = this.getUser();
+        return user ? user.activeCompany : null;
+    }
 }

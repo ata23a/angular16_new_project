@@ -1,18 +1,20 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {InventoryStorage} from "../../model/item";
-import {environment} from "../../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
+import {AppService} from "../app/app.service";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class StorageService {
 
-  constructor(
-    private httpClient:HttpClient
-  ) { }
-  list() {
-    const url = [environment.apiUrl, 'inventory', 'storage'].join('/');
-    return this.httpClient.get<InventoryStorage[]>(url);
-  }
+    constructor(
+        private httpClient: HttpClient
+    ) {
+    }
+
+    list() {
+        const url = [AppService.API, 'inventory', 'storage'].join('/');
+        return this.httpClient.get<InventoryStorage[]>(url);
+    }
 }

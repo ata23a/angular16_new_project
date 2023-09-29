@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {environment} from "../../../../environments/environment";
+import {AppService} from "../app/app.service";
 
 @Injectable({
     providedIn: 'root'
@@ -26,11 +26,12 @@ export class ItemService {
     }
 
     paginate(tableState: TableState): Observable<any> {
-        const url = [environment.apiUrl, 'incomes', 'paginate'].join('/');
+        const url = [AppService.API, 'incomes', 'paginate'].join('/');
         return this.http.post<any>(url, tableState);
     }
+
     paginate2(tableState: TableState): Observable<any> {
-        const url = [environment.apiPascoma, 'incomes', 'paginate'].join('/');
+        const url = [AppService.API, 'incomes', 'paginate'].join('/');
         return this.http.post<any>(url, tableState);
     }
 }

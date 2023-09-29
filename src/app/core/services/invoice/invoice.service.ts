@@ -1,37 +1,43 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import _sumBy from 'lodash.sumby';
 import _forEach from 'lodash.foreach';
 import {HttpClient} from "@angular/common/http";
-import {environment} from "../../../../environments/environment";
 import Invoice, {InvoiceItem} from "../../model/invoice";
 import {catchError, Observable, throwError} from "rxjs";
 import {TableState} from "../item/item.service";
+import {AppService} from "../app/app.service";
+
 const DEFAULT_CURRENCY = 'MGA';
+
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class InvoiceService {
     public static TS_KEY = 'TS_INVOICE';
 
 
-  constructor(
-    private httpClient: HttpClient
-  ) { }
+    constructor(
+        private httpClient: HttpClient
+    ) {
+    }
 
     updateItemWithUnit(id: number, item_id: number, body: any) {
-        const url = [environment.apiPascoma, 'invoices', id, 'item', item_id, 'unit'].join('/');
+        const url = [AppService.API, 'invoices', id, 'item', item_id, 'unit'].join('/');
         return this.httpClient.put<any>(url, body);
     }
+
     search(id): Observable<any> {
-        const url = [environment.apiPascoma, 'invoices', id, 'search'].join('/');
+        const url = [AppService.API, 'invoices', id, 'search'].join('/');
         return this.httpClient.get<any>(url);
     }
+
     cancel(invoice: Invoice): Observable<Invoice> {
-        const url = [environment.apiPascoma, 'invoices', invoice.id].join('/');
+        const url = [AppService.API, 'invoices', invoice.id].join('/');
         return this.httpClient.delete<Invoice>(url);
     }
+
     addItem(id: number, body: any): Observable<any> {
-        const url = [environment.apiPascoma, 'invoices', id, 'item/unit'].join('/');
+        const url = [AppService.API, 'invoices', id, 'item/unit'].join('/');
         return this.httpClient.post<any>(url, body).pipe(
             catchError(err => {
                 if (err.error && typeof err.error.message === 'string') {
@@ -43,50 +49,56 @@ export class InvoiceService {
             })
         );
     }
+
     summary(tableState: TableState, key?): Observable<ServerResult> {
         sessionStorage.setItem(key || InvoiceService.TS_KEY, JSON.stringify(tableState));
 
-        const url = [environment.apiPascoma, 'invoices', 'summary'].join('/');
+        const url = [AppService.API, 'invoices', 'summary'].join('/');
         return this.httpClient.post<ServerResult>(url, tableState);
     }
+
     get(id?: any, action?: any): Observable<any> {
-        const url = [environment.apiPascoma, 'invoices'];
+        const url = [AppService.API, 'invoices'];
 
         if (id) url.push(id);
         if (action) url.push(action);
 
         return this.httpClient.get<any>(url.join('/'));
     }
+
     removeItem(id: number, item_id: number): Observable<any> {
-        const url = [environment.apiPascoma, 'invoices', id, 'item', item_id, 'unit'].join('/');
+        const url = [AppService.API, 'invoices', id, 'item', item_id, 'unit'].join('/');
         return this.httpClient.delete<any>(url);
     }
 
     drafts(params?: any): Promise<Invoice[]> {
-        const url = [environment.apiPascoma, 'invoices', 'draft'].join('/');
+        const url = [AppService.API, 'invoices', 'draft'].join('/');
         return this.httpClient.post<Invoice[]>(url, params).toPromise();
     }
-  getTotalTax(items: any[]): number {
-    return _sumBy(items, item => {
-      return _sumBy(item.Taxes, (tax) => {
-        if (tax.type === 'FIXED') {
-          return item.quantity * tax.rate;
-        }
-        else if (tax.type !== 'DISCOUNT' && tax.type !== 'OTHER') {
-          return (item.price * item.quantity) * tax.rate / 100;
-        }
-        else {
-          return 0;
-        }
-      });
-    });
-  }
+
+    getTotalTax(items: any[]): number {
+        return _sumBy(items, item => {
+            return _sumBy(item.Taxes, (tax) => {
+                if (tax.type === 'FIXED') {
+                    return item.quantity * tax.rate;
+                }
+                else if (tax.type !== 'DISCOUNT' && tax.type !== 'OTHER') {
+                    return (item.price * item.quantity) * tax.rate / 100;
+                }
+                else {
+                    return 0;
+                }
+            });
+        });
+    }
+
     getPaymentDue = (invoiceItems: InvoiceItem[], extra?: any[]): number => {
 
         return _sumBy(invoiceItems, (item) => {
             return item.quantity * item.price;
         });
     };
+
     getTotalPayment(invoice: Invoice): number {
         return _sumBy(invoice?.Revenues, (revenu) => {
             if (revenu.currency_code === DEFAULT_CURRENCY) {
@@ -97,10 +109,12 @@ export class InvoiceService {
             }
         });
     }
-  createWithUnit(invoice: Invoice): Observable<Invoice> {
-    const url = [environment.apiPascoma, 'invoices/units'].join('/');
-    return this.httpClient.post<Invoice>(url, invoice);
-  }
+
+    createWithUnit(invoice: Invoice): Observable<Invoice> {
+        const url = [AppService.API, 'invoices/units'].join('/');
+        return this.httpClient.post<Invoice>(url, invoice);
+    }
+
     getTotalDiscount(invoiceItems: InvoiceItem[]): number {
         let amount = 0;
 
@@ -108,7 +122,8 @@ export class InvoiceService {
             amount += _sumBy(item.Taxes, (tax) => {
                 if (tax.type === 'DISCOUNT') {
                     return (item.price * item.quantity) * tax.rate / 100;
-                } else {
+                }
+                else {
                     return 0;
                 }
             });
@@ -118,18 +133,21 @@ export class InvoiceService {
     }
 
     invoicePrint(id): Observable<any> {
-        const url = [environment.apiPascoma, 'invoices', id, 'print'].join('/');
+        const url = [AppService.API, 'invoices', id, 'print'].join('/');
         return this.httpClient.get<any>(url);
     }
 }
+
 export interface ServerResult {
     data: DisplayedItem<any>[];
     summary: Summary;
 }
+
 export interface DisplayedItem<T> {
     index: number;
     value: T;
 }
+
 export interface Summary {
     page: number;
     size: number;

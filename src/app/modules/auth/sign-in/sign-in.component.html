@@ -1,5 +1,6 @@
 <div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0">
-    <div class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
+    <div
+        class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
         <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
             <!-- Logo -->
             <div class="w-12">
@@ -22,7 +23,8 @@
                 [appearance]="'outline'"
                 [showIcon]="false"
                 [type]="'info'">
-                You are browsing <strong>Fuse Demo</strong>. Click on the "Sign in" button to access the Demo and Documentation.
+                You are browsing <strong>Fuse Demo</strong>. Click on the "Sign in" button to access the Demo and
+                Documentation.
             </fuse-alert>
 
             <!-- Alert -->
@@ -85,13 +87,44 @@
                     </mat-error>
                 </mat-form-field>
 
+                <div class="row">
+                    <div class="col" [hidden]="api">
+                        <div class="form-group mb-3">
+                            <div class="input-icon">
+                                <input
+                                    type="text"
+                                    name="api"
+                                    class="form-control"
+                                    placeholder="Clé"
+                                    formControlName="api"
+                                    required
+                                />
+                                <mat-icon svgIcon="heroicons_outline:key"></mat-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col" [hidden]="api || display_id">
+                        <div class="form-group mb-3">
+                            <div class="input-icon">
+                                <input
+                                    type="text"
+                                    name="display_id"
+                                    class="form-control"
+                                    placeholder="Affichage"
+                                />
+                                <i class="ti-desktop"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Submit button -->
                 <button
                     class="fuse-mat-button-large w-full mt-6"
                     mat-flat-button
                     [color]="'primary'"
                     [disabled]="signInForm.disabled"
-                    (click)="signIn2()">
+                    (click)="signIn()">
                     <span *ngIf="!signInForm.disabled">
                         Sign in
                     </span>
@@ -136,9 +169,19 @@
                     </button>
                 </div>
             </form>
+            <div class="text-center">
+                <div class="copyright">
+                        <span> © <span (click)="clearAppID()">Powered by </span>
+                        <a href="http://capsule.mg" target="_blank" class="font-semibold text-gray-500">CAPSULE IO Finance Technology.</a> v |
+                        <a class=" text-blue-500" href="https://remotedesktop.google.com/support" target="_blank">Support technique</a>
+                        </span>
+                    <div class="block text-muted"></div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="relative hidden md:flex flex-auto items-center justify-center w-1/2 h-full p-16 lg:px-28 overflow-hidden bg-gray-800 dark:border-l">
+    <div
+        class="relative hidden md:flex flex-auto items-center justify-center w-1/2 h-full p-16 lg:px-28 overflow-hidden bg-gray-800 dark:border-l">
         <!-- Background - @formatter:off -->
         <!-- Rings -->
         <svg class="absolute inset-0 pointer-events-none"
@@ -184,7 +227,9 @@
                         class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
                         src="assets/images/avatars/male-16.jpg">
                 </div>
-                <div class="ml-4 font-medium tracking-tight text-gray-400">More than 17k people joined us, it's your turn</div>
+                <div class="ml-4 font-medium tracking-tight text-gray-400">More than 17k people joined us, it's your
+                    turn
+                </div>
             </div>
         </div>
     </div>

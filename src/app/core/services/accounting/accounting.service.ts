@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {InvoiceItem} from "../../model/invoice";
 import _forEach from "lodash/forEach";
 import _sumBy from 'lodash.sumby'
@@ -8,11 +8,12 @@ import BillPayment from "../../model/bill-payment";
 import {BillItem} from "../../model/bill";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class AccountingService {
 
-  constructor() { }
+    constructor() {
+    }
 
     getTotalDiscount(items: Array<InvoiceItem>): number {
         let amount = 0;
@@ -21,7 +22,8 @@ export class AccountingService {
             amount += _sumBy(item.Taxes, (tax) => {
                 if (tax.type === 'DISCOUNT') {
                     return (item.price * item.quantity) * tax.rate / 100;
-                } else {
+                }
+                else {
                     return 0;
                 }
             });
@@ -29,6 +31,7 @@ export class AccountingService {
 
         return amount;
     }
+
     getTotalPayment(payments: Revenue[] | BillPayment[]): number {
         return _sumBy(payments, (revenu) => {
             if (revenu.payment_method === 'SP') return 0;
@@ -36,6 +39,7 @@ export class AccountingService {
             else return revenu.amount / (revenu.currency_rate || 1);
         });
     }
+
     getPaymentDue(items: InvoiceItem[] | BillItem[], item_type?: 'BUS_SEAT' | 'SERVICES'): number {
         return _sumBy(items, item => {
             if (item_type) {
@@ -44,6 +48,7 @@ export class AccountingService {
             else return item.quantity * item.price;
         });
     }
+
     getTotalTax(items: Array<InvoiceItem>): number {
         return _sumBy(items, item => {
             return _sumBy(item.Taxes, (tax) => {
