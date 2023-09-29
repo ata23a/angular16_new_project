@@ -18,6 +18,10 @@ import { CompactLayoutComponent } from './layouts/vertical/compact/compact.compo
 import { DenseLayoutComponent } from './layouts/vertical/dense/dense.component';
 import { FuturisticLayoutComponent } from './layouts/vertical/futuristic/futuristic.component';
 import { ThinLayoutComponent } from './layouts/vertical/thin/thin.component';
+import {OnlineBusLayoutComponent} from "./online-bus-layout/online-bus-layout.component";
+import {AppModule} from "../app.module";
+import {OnlineHotelLayoutComponent} from "./online-hotel-layout/online-hotel-layout.component";
+import {AuthLayoutComponent} from "./auth-layout/auth-layout.component";
 
 @Component({
     selector     : 'layout',
@@ -25,7 +29,7 @@ import { ThinLayoutComponent } from './layouts/vertical/thin/thin.component';
     styleUrls    : ['./layout.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone   : true,
-    imports      : [NgIf,
+    imports: [NgIf,
         EmptyLayoutComponent,
         CenteredLayoutComponent,
         EnterpriseLayoutComponent,
@@ -37,7 +41,7 @@ import { ThinLayoutComponent } from './layouts/vertical/thin/thin.component';
         DenseLayoutComponent,
         FuturisticLayoutComponent,
         ThinLayoutComponent,
-        SettingsComponent],
+        SettingsComponent, OnlineBusLayoutComponent, AppModule, OnlineHotelLayoutComponent, AuthLayoutComponent],
 })
 export class LayoutComponent implements OnInit, OnDestroy
 {

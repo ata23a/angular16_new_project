@@ -10,6 +10,7 @@ import { provideAuth } from 'app/core/auth/auth.provider';
 import { provideIcons } from 'app/core/icons/icons.provider';
 import { provideTransloco } from 'app/core/transloco/transloco.provider';
 import { mockApiServices } from 'app/mock-api';
+import { AppService } from './core/services/app/app.service';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -52,7 +53,7 @@ export const appConfig: ApplicationConfig = {
                 services: mockApiServices,
             },
             fuse   : {
-                layout : 'classy',
+                layout : 'bus',
                 scheme : 'light',
                 screens: {
                     sm: '600px',

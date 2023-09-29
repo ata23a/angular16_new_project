@@ -6,8 +6,10 @@
         <div class="form-group">
             <label class="block mb-2 text-sm font-medium dark:text-white">Nom</label>
             <mat-form-field class="w-100">
-                <input matInput [readonly]="selected" [matAutocomplete]="auto" formControlName="item"
-                       [(ngModel)]="selected" placeholder="tapez pour chercher..." [formControl]="itemControl">
+                <input matInput *ngIf="!selected" [readonly]="selected" [matAutocomplete]="auto" formControlName="item"
+                        placeholder="tapez pour chercher..." [formControl]="itemControl">
+                <input matInput *ngIf="selected" readonly [(ngModel)]="selected" [matAutocomplete]="auto" formControlName="item"
+                       placeholder="tapez pour chercher..." [formControl]="itemControl">
                 <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
                     <mat-option *ngFor="let item of filteredOptions | async" [value]="item"
                                 (onSelectionChange)="onSelectItem2($event)">
@@ -42,7 +44,7 @@
                 </mat-select>
             </div>
             <div class="col-md-4 form-group">
-                <label>Quantité</label>
+                <label class="block mb-2 text-sm font-medium dark:text-white">Quantité</label>
                 <input type="number" formControlName="quantity" [readonly]="selected" class="form-control" [min]="1"
                        [class.error]="submitted && form.controls.quantity.invalid">
             </div>

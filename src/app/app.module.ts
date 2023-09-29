@@ -9,6 +9,13 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NgbHighlight, NgbTypeahead} from "@ng-bootstrap/ng-bootstrap";
 import {CommonModule, NgClass} from "@angular/common";
 import {NgSelectModule} from "@ng-select/ng-select";
+import {FuseAlertComponent} from "../@fuse/components/alert";
+import {MatButtonModule} from "@angular/material/button";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatIconModule} from "@angular/material/icon";
+import {MatInputModule} from "@angular/material/input";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {RouterOutlet} from "@angular/router";
 
 @NgModule({
   declarations: [
@@ -26,10 +33,17 @@ import {NgSelectModule} from "@ng-select/ng-select";
         CommonModule,
         ReactiveFormsModule,
         NgSelectModule,
+        FuseAlertComponent,
+        MatButtonModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatProgressSpinnerModule,
+        RouterOutlet,
     ],
-  exports: [
-    TypeheadContactComponent,
-  ],
+    exports: [
+        TypeheadContactComponent,
+    ],
     providers: [
       MatSnackBarModule,
         {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},

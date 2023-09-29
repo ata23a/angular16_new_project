@@ -143,15 +143,11 @@
                                                             <span hidden>{{ item.controls.meta?.value }}</span>
                                                         </td>
                                                         <td>
-                                                            <span class="pointer px-2 text-nowrap text-dark"
-                                                                  data-toggle="collapse" title="Voir description"
-                                                                  [attr.data-target]="'#collapse-' + i">
+                                                            <button class="cursor-pointer px-2 whitespace-nowrap text-gray-800"
+                                                                    (click)="toggleCollapse(i)" title="Voir description">
                                                                 {{ item.controls.name?.value }}
-                                                            </span>
-
-                                                            <div class="collapse font-size-13 px-2 pt-0 pb-1"
-                                                                 id="collapse-{{i}}"
-                                                                 [class.show]="item.controls.description?.value">
+                                                            </button>
+                                                            <div class="font-size-13 px-2 pt-0 pb-1" [ngClass]="{'d-none': !isCollapsed[i]}">
                                                                 {{ item.controls.description?.value || 'Aucune description' }}
                                                             </div>
                                                         </td>

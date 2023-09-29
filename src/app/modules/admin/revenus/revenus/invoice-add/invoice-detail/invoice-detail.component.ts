@@ -91,6 +91,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
     itemUnits: Array<ItemUnit>;
     taxes: Array<Tax>;
     items: Array<Item> = [];
+    isCollapsed: boolean[] = [];
 
     constructor(
         private invoiceService: InvoiceService,
@@ -120,6 +121,11 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
     }
     ngOnDestroy() {
         this.subscription.unsubscribe();
+    }
+
+    // Méthode pour basculer l'état du collapse
+    toggleCollapse(index: number) {
+        this.isCollapsed[index] = !this.isCollapsed[index];
     }
 
     openConfirm() {
@@ -367,6 +373,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
         this.invoiceService.get(id)
             .toPromise()
             .then(invoice => {
+                console.log(invoice)
                 this.invoice = invoice;
                 this.invoice.Revenues = _orderBy(invoice.Revenues, ['id'], ['desc']);
                 this.Total.discount = this.accountingService.getTotalDiscount(this.invoice.InvoiceItems);

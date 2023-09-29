@@ -40,6 +40,7 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatIconModule} from "@angular/material/icon";
 import {NgbActiveModal, NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import item from "../../../../../../../core/model/item";
+import Swal from "sweetalert2";
 
 @Component({
     selector: 'app-modal',
@@ -176,10 +177,16 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
             default:
         }
 
-        /*if (promise) {
-            promise.then(() => this.activeModal.dismiss('DELETE')).catch(err => this.notification.error(null, err.error));
+        if (promise) {
+            promise.then(() => this.dialogRef.close('DELETE')).catch(err => this.notification.error(null, err.error));
         }
-        else this.notification.error(null, 'TYPE_NOT_FOUND');*/
+        else
+            Swal.fire({
+                toast: true, position: 'top',
+                title: 'Attention',
+                text: 'Une erreur c\'est produit',
+                icon: 'warning', showConfirmButton: false, timer: 3000,
+            });
     }
 
     private getMetaByType() {
@@ -235,6 +242,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.form.get('total').setValue((price || 0) * (quantity || 0), {emitEvent: false});
             })
         );
+        console.log(this.form.value)
     }
 
     private loadUnits() {
@@ -264,6 +272,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
                     }),
                     total: 0
                 });
+                console.log(this.form.get('units').value)
             }
             else {
                 this.notification.error(null, 'ITEM_OUT_OF_STOCK');
