@@ -98,6 +98,11 @@ export class AuthSignInComponent implements OnInit {
                             toast: true,
                             position: 'top',
                             showConfirmButton: false,
+                            showClass: {
+                                backdrop: 'swal2-noanimation',
+                                popup: '',
+                                icon: ''
+                            },
                             timer: 9000,
                             title: 'Success!',
                             text: 'Vous etes Authentifier',
