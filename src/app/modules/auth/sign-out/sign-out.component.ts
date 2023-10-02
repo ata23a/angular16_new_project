@@ -47,6 +47,7 @@ export class AuthSignOutComponent implements OnInit, OnDestroy
             .pipe(
                 finalize(() =>
                 {
+                    sessionStorage.removeItem('logedIn')
                     this._router.navigate(['sign-in']);
                 }),
                 takeWhile(() => this.countdown > 0),

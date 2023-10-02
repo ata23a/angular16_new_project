@@ -3,7 +3,6 @@ import { initialDataResolver } from 'app/app.resolvers';
 import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
-import {RevenusComponent} from "./modules/admin/revenus/revenus/revenus.component";
 
 // @formatter:off
 /* eslint-disable max-len */
@@ -27,7 +26,7 @@ export const appRoutes: Route[] = [
         canActivateChild: [NoAuthGuard],
         component: LayoutComponent,
         data: {
-            layout: 'empty'
+            layout: 'auth'
         },
         children: [
             {path: 'confirmation-required', loadChildren: () => import('app/modules/auth/confirmation-required/confirmation-required.routes')},
@@ -76,78 +75,12 @@ export const appRoutes: Route[] = [
         },
         children: [
             {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')},
-        ]
-    },
-    {
-        path: '',
-        canActivate: [AuthGuard],
-        canActivateChild: [AuthGuard],
-        component: LayoutComponent,
-        resolve: {
-            initialData: initialDataResolver
-        },
-        children: [
             {path: 'revenus', loadChildren: () => import('app/modules/admin/revenus/revenus/revenus.routes')},
-        ]
-    },
-    {
-        path: '',
-        canActivate: [AuthGuard],
-        canActivateChild: [AuthGuard],
-        component: LayoutComponent,
-        resolve: {
-            initialData: initialDataResolver
-        },
-        children: [
             {path: 'invoiceAdd', loadChildren: () => import('app/modules/admin/revenus/revenus/invoice-add/invoice-add.routes')},
-        ]
-    },
-    {
-        path: '',
-        canActivate: [AuthGuard],
-        canActivateChild: [AuthGuard],
-        component: LayoutComponent,
-        resolve: {
-            initialData: initialDataResolver
-        },
-        children: [
             {path: 'requete', loadChildren: () => import('app/modules/admin/requete/requete.routes')},
-        ]
-    },
-    {
-        path: '',
-        canActivate: [AuthGuard],
-        canActivateChild: [AuthGuard],
-        component: LayoutComponent,
-        resolve: {
-            initialData: initialDataResolver
-        },
-        children: [
             {path: 'invoiceDetail/:id', loadChildren: () => import('app/modules/admin/revenus/revenus/invoice-add/invoice-detail/invoice-detail.routes')},
-        ]
-    },
-    {
-        path: '',
-        canActivate: [AuthGuard],
-        canActivateChild: [AuthGuard],
-        component: LayoutComponent,
-        resolve: {
-            initialData: initialDataResolver
-        },
-        children: [
             {path: 'invoiceList', loadChildren: () => import('app/modules/admin/revenus/revenus/invoice-list/invoice-list.routes')},
-        ]
-    },
-    {
-        path: '',
-        canActivate: [AuthGuard],
-        canActivateChild: [AuthGuard],
-        component: LayoutComponent,
-        resolve: {
-            initialData: initialDataResolver
-        },
-        children: [
             {path: 'invoiceSearch', loadChildren: () => import('app/modules/admin/revenus/search/income-search/income-search.routes')},
         ]
-    }
+    },
 ];

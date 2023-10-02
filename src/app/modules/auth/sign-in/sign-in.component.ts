@@ -20,6 +20,7 @@ import {FuseAlertComponent, FuseAlertType} from '@fuse/components/alert';
 import {AuthentificationService} from "../../../core/services/authentification/authentification.service";
 import {AppService} from "../../../core/services/app/app.service";
 import Swal from "sweetalert2";
+import {FuseConfigService} from "../../../../@fuse/services/config";
 
 @Component({
     selector: 'auth-sign-in',
@@ -57,6 +58,7 @@ export class AuthSignInComponent implements OnInit {
         private authService: AuthentificationService,
         private _formBuilder: UntypedFormBuilder,
         private _router: Router,
+        private _fuseConfigService: FuseConfigService,
     ) {
     }
 
@@ -79,6 +81,7 @@ export class AuthSignInComponent implements OnInit {
         if (this.signInForm.valid) {
             const formValue = this.signInForm.value;
 
+
             AppService.API = `${formValue.api}`;
 
             this.authService.login(formValue.email, formValue.password)
@@ -89,11 +92,20 @@ export class AuthSignInComponent implements OnInit {
 
                         user.activeRoleIndex = 0;
 
+                        sessionStorage.setItem('logedIn', 'loged')
                         sessionStorage.setItem('token', res['token']);
                         sessionStorage.setItem('session', JSON.stringify({
                             user: user,
                             config: res['config']
                         }));
+
+                        /*let layout = 'bus'; // Par défaut
+                        if (formValue.api === 'https://api.capsule.mg/pascoma') {
+                            layout = 'hotel';
+                        }
+
+                        this.setLayout(layout)*/
+
                         Swal.fire({
                             toast: true,
                             position: 'top',
@@ -136,6 +148,17 @@ export class AuthSignInComponent implements OnInit {
                 icon: 'warning', showConfirmButton: false, timer: 3000,
             })
         }
+    }
+
+    setLayout(layout: string): void {
+        this._router.navigate([], {
+            queryParams: {
+                layout: null,
+            },
+            queryParamsHandling: 'merge',
+        }).then(() => {
+            this._fuseConfigService.config = {layout};
+        });
     }
 
     clearAppID() {
