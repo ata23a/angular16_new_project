@@ -1,0 +1,76 @@
+<form role="form" [formGroup]="form" (ngSubmit)="saveHistory()">
+    <!--<table class="table table-striped no-border m-0">
+        <thead>
+        <tr>
+            <th class="no-border" translate>Description</th>
+            <th class="no-border width-20" translate>Créé</th>
+            <th class="no-border width-15" translate>Action</th>
+            <th class="no-border width-20 text-right" translate>Utilisateur</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngIf="dataTable?.length === 0">
+            <td colspan="4" class="text-center" translate>Aucun enregistrement</td>
+        </tr>
+        <tr *ngFor="let item of sortedData">
+            <td [innerHTML]="displayItems(item)"></td>
+            <td>{{item.created_at | date:'dd MMM yyyy HH:mm'}}</td>
+            <td>{{item.status_code}}</td>
+            <td class="text-right">
+                {{item?.User ? item.User.name : item?.user_id}}
+            </td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="3">
+                <input type="text" class="form-control input-sm no-border p-0" formControlName="description"
+                       placeholder="Entrer description ..."
+                       [class.error]="submitted && form.controls.description.invalid">
+            </td>
+            <td>
+                <button class="btn btn-success btn-sm width-100" appXhrBtnIndicator translate>Ajouter</button>
+            </td>
+        </tr>
+        </tfoot>
+    </table>-->
+
+    <mat-table [dataSource]="sortedData" class="mat-elevation-z8">
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef translate>Description</mat-header-cell>
+            <mat-cell *matCellDef="let item"  [innerHTML]="displayItems(item)"></mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="created_at">
+            <mat-header-cell *matHeaderCellDef translate>Créé</mat-header-cell>
+            <mat-cell *matCellDef="let item">{{ item.created_at | date:'dd MMM yyyy HH:mm' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="status_code">
+            <mat-header-cell *matHeaderCellDef translate>Action</mat-header-cell>
+            <mat-cell *matCellDef="let item">{{ item.status_code }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="user">
+            <mat-header-cell *matHeaderCellDef translate>Utilisateur</mat-header-cell>
+            <mat-cell *matCellDef="let item">{{ item.User ? item.User.name : item.user_id }}</mat-cell>
+        </ng-container>
+
+        <!-- Define the columns for your table here. You can add more columns if needed. -->
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+    <table>
+        <tr>
+            <td colspan="3">
+                <input type="text" class="border h-10 border-gray-300 rounded-sm p-0" formControlName="description"
+                       placeholder="Entrer description ..."
+                       [class.error]="submitted && form.controls.description.invalid">
+            </td>
+            <td>
+                <button class="bg-green-500 h-10 text-white px-2 py-1 text-sm w-full" appXhrBtnIndicator translate>Ajouter</button>
+            </td>
+        </tr>
+    </table>
+</form>

@@ -37,6 +37,10 @@ import moment from "moment";
 import {NgxMaskDirective, provideNgxMask} from "ngx-mask";
 import localeFr from '@angular/common/locales/fr';
 import {ComfirmModalComponent} from "./comfirm-modal/comfirm-modal.component";
+import {ListPaymentComponent} from "../../list-payment/list-payment.component";
+import Revenue from "../../../../../../core/model/revenue";
+import {InvoiceHistoriqueComponent} from "../../invoice-historique/invoice-historique.component";
+import {TranslateModule} from "@ngx-translate/core";
 registerLocaleData(localeFr);
 
 
@@ -45,6 +49,8 @@ registerLocaleData(localeFr);
     standalone: true,
     templateUrl: './invoice-detail.component.html',
     providers:[
+        TranslateModule,
+        CurrencyPipe,
         provideNgxMask(),
         { provide: LOCALE_ID, useValue: 'fr-FR'},
     ],
@@ -64,12 +70,14 @@ registerLocaleData(localeFr);
         MatInputModule,
         MatDatepickerModule,
         MatIconModule,
-        CurrencyPipe,
         NgStyle,
         MatButtonModule,
         MatMenuModule,
         MatListModule,
         NgxMaskDirective,
+        ListPaymentComponent,
+        CurrencyPipe,
+        InvoiceHistoriqueComponent,
     ],
     styleUrls: ['./invoice-detail.component.scss']
 })
@@ -92,6 +100,8 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
     taxes: Array<Tax>;
     items: Array<Item> = [];
     isCollapsed: boolean[] = [];
+    revenus: Revenue[] = [];
+    histories: Array<any>;
 
     constructor(
         private invoiceService: InvoiceService,
@@ -373,9 +383,11 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
         this.invoiceService.get(id)
             .toPromise()
             .then(invoice => {
-                console.log(invoice)
                 this.invoice = invoice;
+                console.log(this.invoice.InvoiceHistories)
                 this.invoice.Revenues = _orderBy(invoice.Revenues, ['id'], ['desc']);
+                this.revenus = this.invoice.Revenues
+                this.histories = this.invoice.InvoiceHistories
                 this.Total.discount = this.accountingService.getTotalDiscount(this.invoice.InvoiceItems);
                 this.Total.payment = this.accountingService.getTotalPayment(this.invoice.Revenues);
                 this.Total.payment_due = this.accountingService.getPaymentDue(this.invoice.InvoiceItems);

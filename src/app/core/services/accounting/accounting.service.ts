@@ -1,19 +1,34 @@
 import {Injectable} from '@angular/core';
-import {InvoiceItem} from "../../model/invoice";
+import {Invoice, InvoiceItem} from "../../model/invoice";
 import _forEach from "lodash/forEach";
 import _sumBy from 'lodash.sumby'
 import {AppService} from "../app/app.service";
 import Revenue from "../../model/revenue";
 import BillPayment from "../../model/bill-payment";
-import {BillItem} from "../../model/bill";
+import {Bill, BillItem} from "../../model/bill";
+import {Subject} from "rxjs";
+import InvoicePayment from "../../model/invoice-payment";
 
 @Injectable({
     providedIn: 'root'
 })
 export class AccountingService {
+    private $invoice = new Subject<Invoice | Bill>();
+    private $payment = new Subject<Revenue | InvoicePayment>();
+    private $sidePanelPayment = new Subject<boolean>();
 
     constructor() {
     }
+    get facture() {
+        return this.$invoice;
+    }
+    get payment() {
+        return this.$payment;
+    }
+    get sidePanelPayment() {
+        return this.$sidePanelPayment;
+    }
+
 
     getTotalDiscount(items: Array<InvoiceItem>): number {
         let amount = 0;

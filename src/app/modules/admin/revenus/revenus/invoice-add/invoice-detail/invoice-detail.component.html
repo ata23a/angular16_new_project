@@ -184,7 +184,7 @@
                                                         </td>
                                                         <td class="text-dark">
                                                             <input type="text" class="form-control text-right" readonly
-                                                                   [value]="getTotal(item) ">
+                                                                   [value]="getTotal(item).toLocaleString('fr-FR') ">
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -264,20 +264,19 @@
                             </div>
                         </div>
                     </form>
-                    <!--<button type="button" class="border-2" (click)="print('A4V2')" > Imprimmer en PDF
-
-                    </button>-->
                 </mat-tab>
                 <mat-tab label="PAIEMENT">
-
+                    <list-payment [facture]="invoice" [dataTable]="revenus"></list-payment>
                 </mat-tab>
                 <mat-tab label="HISORIQUE">
-
+                    <invoice-historique [dataTable]="histories"
+                                        [dataType]="'INVOICE'"
+                                        [dataId]="invoice?.id"
+                                        (onSubmit)="resetForm()"></invoice-historique>
                 </mat-tab>
+                <mat-tab class="text-green-500" label="{{invoice?.status}}" disabled></mat-tab>
 
             </mat-tab-group>
         </div>
-
     </div>
-
 </div>

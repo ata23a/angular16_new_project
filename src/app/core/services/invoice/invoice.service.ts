@@ -110,6 +110,11 @@ export class InvoiceService {
         });
     }
 
+    addHistory(params): Observable<any> {
+        const url = [AppService.API, 'invoices', params['id'], 'note'].join('/');
+        return this.httpClient.post<any>(url, params);
+    }
+
     createWithUnit(invoice: Invoice): Observable<Invoice> {
         const url = [AppService.API, 'invoices/units'].join('/');
         return this.httpClient.post<Invoice>(url, invoice);

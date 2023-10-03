@@ -23,4 +23,8 @@ export class BillService {
         const url = [AppService.API, 'bills', bill.id, 'unit'].join('/');
         return this.httpClient.delete<Bill>(url);
     }
+    addHistory(params): Observable<any> {
+        const url = [AppService.API, 'bills', params['id'], 'note'].join('/');
+        return this.httpClient.post<any>(url, params);
+    }
 }
