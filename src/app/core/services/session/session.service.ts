@@ -10,6 +10,18 @@ export class SessionService {
     constructor() {
     }
 
+    getUserExtra = (type: 'account_id' | 'location_id') => {
+        const user = this.getUser();
+
+        if (user.hasOwnProperty('extra') && user.extra) {
+            if (user.extra.hasOwnProperty(type) && user.extra[type]) {
+                return user.extra[type];
+            }
+        }
+
+        return null;
+    };
+
     getToken = () => {
         return window.sessionStorage.getItem('token');
     };

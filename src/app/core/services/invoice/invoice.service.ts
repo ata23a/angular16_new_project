@@ -6,6 +6,8 @@ import Invoice, {InvoiceItem} from "../../model/invoice";
 import {catchError, Observable, throwError} from "rxjs";
 import {TableState} from "../item/item.service";
 import {AppService} from "../app/app.service";
+import BillPayment from "../../model/bill-payment";
+import InvoicePayment from "../../model/invoice-payment";
 
 const DEFAULT_CURRENCY = 'MGA';
 
@@ -20,7 +22,10 @@ export class InvoiceService {
         private httpClient: HttpClient
     ) {
     }
-
+    cashReward(id, body): Observable<any> {
+        const url = [AppService.API, 'invoices', id, 'payment/reward'].join('/');
+        return this.httpClient.post<any>(url, body);
+    }
     updateItemWithUnit(id: number, item_id: number, body: any) {
         const url = [AppService.API, 'invoices', id, 'item', item_id, 'unit'].join('/');
         return this.httpClient.put<any>(url, body);
@@ -34,6 +39,10 @@ export class InvoiceService {
     cancel(invoice: Invoice): Observable<Invoice> {
         const url = [AppService.API, 'invoices', invoice.id].join('/');
         return this.httpClient.delete<Invoice>(url);
+    }
+    createPayment(payment: InvoicePayment): Observable<InvoicePayment> {
+        const url = [AppService.API, 'invoices', payment['invoice_id'], 'payment'].join('/');
+        return this.httpClient.post<InvoicePayment>(url, payment);
     }
 
     addItem(id: number, body: any): Observable<any> {

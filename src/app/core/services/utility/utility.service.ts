@@ -1,4 +1,6 @@
 import {Injectable} from '@angular/core';
+import {NgbDate} from "@ng-bootstrap/ng-bootstrap";
+import moment from "moment";
 
 @Injectable({
     providedIn: 'root'
@@ -8,6 +10,20 @@ export class UtilityService {
 
     constructor() {
     }
+
+    ngbDateToMoment = (date: NgbDate) => {
+        const cT = moment();
+
+        cT.set({
+            date: date.day,
+            month: date.month - 1,
+            year: date.year,
+            hour: 12,
+            minute: 0
+        });
+
+        return cT;
+    };
 
     statusStyle = (status) => {
         const style = {

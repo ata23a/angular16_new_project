@@ -1,4 +1,4 @@
-import {Component, LOCALE_ID, OnDestroy, OnInit} from '@angular/core';
+import {Component, LOCALE_ID, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {InvoiceService} from "../../../../../../core/services/invoice/invoice.service";
 import {NotificationService} from "../../../../../../core/services/notifications/notification.service";
 import {InvoicePrintService} from "../../../../../../core/services/print/invoice-print.service";
@@ -14,7 +14,7 @@ import {MatTabsModule} from "@angular/material/tabs";
 import {AppModule} from "../../../../../../app.module";
 import {NgSelectModule} from "@ng-select/ng-select";
 import {AsyncPipe, CurrencyPipe, NgClass, NgForOf, NgIf, NgStyle, registerLocaleData} from "@angular/common";
-import {map, Observable, Subscription} from "rxjs";
+import {map, Observable, Subscription, throwError} from "rxjs";
 import Category from "../../../../../../core/model/category";
 import {CategoryService} from "../../../../../../core/services/category/category.service";
 import {MatFormFieldModule} from "@angular/material/form-field";
@@ -41,18 +41,29 @@ import {ListPaymentComponent} from "../../list-payment/list-payment.component";
 import Revenue from "../../../../../../core/model/revenue";
 import {InvoiceHistoriqueComponent} from "../../invoice-historique/invoice-historique.component";
 import {TranslateModule} from "@ngx-translate/core";
-registerLocaleData(localeFr);
+import {FuseDrawerComponent} from "../../../../../../../@fuse/components/drawer";
+import Bill from "../../../../../../core/model/bill";
+import {JsPrintService} from "../../../../../../core/services/jsPrint/js-print.service";
+import {RoleService} from "../../../../../../core/services/role/role.service";
+import {IncomeService} from "../../../income.service";
+import Account from "../../../../../../core/model/account";
+import {AppService} from "../../../../../../core/services/app/app.service";
+import {PipeService} from "../../../../../../core/services/pipe/pipe.service";
+import {AccountService} from "../../../../../../core/services/account/account.service";
+import Swal from "sweetalert2";
+import {UtilityService} from "../../../../../../core/services/utility/utility.service";
 
+registerLocaleData(localeFr);
 
 @Component({
     selector: 'app-invoice-detail',
     standalone: true,
     templateUrl: './invoice-detail.component.html',
-    providers:[
+    providers: [
         TranslateModule,
         CurrencyPipe,
         provideNgxMask(),
-        { provide: LOCALE_ID, useValue: 'fr-FR'},
+        {provide: LOCALE_ID, useValue: 'fr-FR'},
     ],
     imports: [
         MatTabsModule,
@@ -78,10 +89,11 @@ registerLocaleData(localeFr);
         ListPaymentComponent,
         CurrencyPipe,
         InvoiceHistoriqueComponent,
+        FuseDrawerComponent,
     ],
     styleUrls: ['./invoice-detail.component.scss']
 })
-export class InvoiceDetailComponent implements OnInit, OnDestroy{
+export class InvoiceDetailComponent implements OnInit, OnDestroy {
     subscription = new Subscription();
     invoice: Invoice;
     id;
@@ -94,7 +106,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
         unpaid: 0
     };
     invoiceForm: FormGroup;
-    submitted;
+    submitted: boolean;
     categories: Observable<Category[]>;
     itemUnits: Array<ItemUnit>;
     taxes: Array<Tax>;
@@ -102,8 +114,17 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
     isCollapsed: boolean[] = [];
     revenus: Revenue[] = [];
     histories: Array<any>;
+    form: FormGroup;
+    rewardForm: FormGroup;
+    facture: Invoice | Bill;
+    dateLocked: any;
+    accounts: Array<Account>;
+    formFieldHelpers: string[] = [''];
+    sidePanelOpen: boolean;
+    @ViewChild('drawer') drawer: FuseDrawerComponent;
 
     constructor(
+        public appService: AppService,
         private invoiceService: InvoiceService,
         private notification: NotificationService,
         private printService: InvoicePrintService,
@@ -116,9 +137,16 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
         private inventoryService: IventoryService,
         private dialog: MatDialog,
         private taxService: TaxService,
-        private router: Router
+        private router: Router,
+        private jsPrintService: JsPrintService,
+        private firstNamePipe: PipeService,
+        private roleService: RoleService,
+        private incomeService: IncomeService,
+        private accountService: AccountService,
+        public utilityService: UtilityService
     ) {
     }
+
     ngOnInit() {
         this.categories = this.categoryService.list({type: 'income'});
         this.id = this.activatedRoute.snapshot.paramMap.get('id');
@@ -127,8 +155,193 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
         this.getCompanyInfo()
         this.getUnits();
         this.getTaxes()
-
+        this.initForm2()
+        this.onSubscribe()
     }
+
+    openSidePanelPayment() {
+        this.accountingService.facture.next(this.invoice);
+        this.accountingService.sidePanelPayment.next(true);
+    }
+
+    private onSubscribe() {
+        this.subscription.add(
+            this.accountingService.sidePanelPayment.subscribe(value => {
+                console.log(value)
+                this.sidePanelOpen = value;
+                if (this.sidePanelOpen) {
+                    this.dateLocked = true;
+
+                    this.accountService.list()
+                        .pipe(map(item => _orderBy(item, ['name'], ['asc'])))
+                        .toPromise()
+                        .then(res => this.accounts = res)
+                        .catch(err => this.notification.error(null, err.error));
+                }
+            })
+        );
+
+        this.subscription.add(
+            this.accountingService.facture.subscribe(value => {
+                console.log(value)
+                if (value) {
+                    let paymentDue: any;
+                    let totalPayment: any;
+                    let totalTax: any;
+                    let totalDiscount: any;
+
+                    this.facture = new Invoice(value);
+                    paymentDue = this.accountingService.getPaymentDue(this.facture.InvoiceItems);
+                    totalPayment = this.accountingService.getTotalPayment(this.facture.Revenues);
+                    totalTax = this.accountingService.getTotalTax(this.facture.InvoiceItems);
+                    totalDiscount = this.accountingService.getTotalDiscount(this.facture.InvoiceItems);
+
+                    const accountId = this.sessionService.getUserExtra('account_id');
+
+                    this.form.patchValue({
+                        account_id: accountId,
+                        amount: paymentDue + totalTax - totalDiscount - totalPayment
+                    });
+
+                    this.rewardForm.patchValue({account_id: accountId});
+                }
+            })
+        );
+
+        this.subscription.add(
+            this.accountingService.payment.subscribe(value => {
+                if (value) {
+                    this.form.patchValue({
+                        account_id: value.account_id || this.sessionService.getUserExtra('account_id'),
+                        amount: value.amount,
+                        payment_method: value.payment_method
+                    });
+                }
+            })
+        );
+    }
+
+    private initForm2() {
+        const cT = moment().toDate();
+
+        this.form = this.formBuilder.group({
+            description: null,
+            paid_at: [
+                {value: cT, disabled: true},
+                Validators.required
+            ],
+            amount: [null, Validators.required],
+            account_id: [null, Validators.required],
+            payment_method: [null, Validators.required]
+        });
+
+        this.rewardForm = this.formBuilder.group({
+            paid_at: [
+                {value: cT, disabled: true},
+                Validators.required
+            ],
+            account_id: [null, Validators.required],
+            description: null
+        });
+    }
+
+    updateLockState(form: FormGroup): void {
+        this.dateLocked = !this.dateLocked;
+        if (this.dateLocked) {
+            form.get('paid_at').disable();
+        }
+        else {
+            form.get('paid_at').enable();
+        }
+    }
+
+    save() {
+        this.submitted = true;
+
+        if (this.form.valid) {
+            const formValue = this.form.getRawValue();
+            const body = Object.assign({}, formValue, {
+                category_id: this.facture.category_id,
+                currency_code: 'MGA',
+                currency_rate: 1,
+                contact_name: this.facture.Contact ? this.facture.Contact.name : this.facture.Vendor.name
+            });
+
+            body.invoice_id = this.facture.id;
+            body.type = 'INVOICE_PAYMENT';
+
+            this.invoiceService.createPayment(body)
+                .toPromise()
+                .then(res => {
+                    this.sendSMSRole();
+
+                    this.subscription.add(
+                        this.incomeService.get(res.id).subscribe(payment => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top',
+                                showConfirmButton: false,
+                                showClass: {
+                                    backdrop: 'swal2-noanimation',
+                                    popup: '',
+                                    icon: ''
+                                },
+                                timer: 9000,
+                                title: 'Succées!',
+                                text: 'Ajout avec succées',
+                                icon: 'success',
+                            });
+                            this.jsPrintService.printCashReceipt({
+                                id: payment.id,
+                                account_name: payment.Account.name,
+                                amount: payment.amount,
+                                category_name: payment.Category.name,
+                                contact_name: payment.Contact ? payment.Contact.name : payment.contact_name,
+                                description: payment.description,
+                                paid_at: moment(payment.paid_at).format('YYYY-MM-DD'),
+                                type: payment.amount < 0 ? 'DEBIT' : 'CREDIT',
+                                user_name: `${this.firstNamePipe.transform(this.sessionService.getUser().name)}.`
+                            });
+                        })
+                    );
+                })
+                .catch(err => {
+                    console.log(err)
+                    if (err.status === 400) {
+                        Swal.fire({
+                            toast: true, position: 'top',
+                            title: 'Erreur',
+                            text: 'Crédit non pris en charge',
+                            icon: 'error', showConfirmButton: false, timer: 3000,
+                        })
+                    }
+                });
+        }
+        else {
+            Swal.fire({
+                toast: true, position: 'top',
+                title: 'Attention',
+                text: 'Form non valider',
+                icon: 'warning', showConfirmButton: false, timer: 3000,
+            })
+        }
+    }
+
+    private sendSMSRole() {
+        const paymentMethod = this.form.get('payment_method').value;
+
+        if (paymentMethod === 'SP') {
+            const userName = this.firstNamePipe.transform(this.sessionService.getUser().name);
+            const contactName = this.facture.Contact.name || this.facture.contact_name;
+            const message = `SP ${contactName} . Facture #${this.facture.id} . U ${userName}`;
+
+            this.roleService.sendSMSRole(message, 'sp').toPromise()
+                .then(() => {
+                })
+                .catch(err => throwError(err.error));
+        }
+    }
+
     ngOnDestroy() {
         this.subscription.unsubscribe();
     }
@@ -137,6 +350,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
     toggleCollapse(index: number) {
         this.isCollapsed[index] = !this.isCollapsed[index];
     }
+
 
     openConfirm() {
         const modalRef = this.dialog.open(ComfirmModalComponent, {
@@ -156,6 +370,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
             }
         });
     }
+
     @Confirmable({title: 'Confirmation',}, true)
     duplicate(response?) {
         if (response) {
@@ -182,13 +397,15 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
             delete body.id;
             delete body.InvoiceHistories;
 
-            this.invoiceService.createWithUnit(body).subscribe(res=>{
+            this.invoiceService.createWithUnit(body).subscribe(res => {
                 this.router.navigate(['invoiceDetail/', res.id]);
             })
-            }else{
+        }
+        else {
             console.log('error')
         }
     }
+
     getTotal(formGroup: FormGroup) {
         const total = formGroup.controls.quantity.value * formGroup.controls.price.value;
 
@@ -196,6 +413,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
 
         return total;
     }
+
     private getTaxes() {
         this.taxService.list().pipe(
             map(taxes => taxes.map(item => {
@@ -207,12 +425,15 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
             this.taxes = value
         });
     }
+
     isNew = (item) => item.controls['state'] ? false : true;
+
     private getUnits() {
-        this.inventoryService.getItemUnits2().subscribe(units=>{
+        this.inventoryService.getItemUnits2().subscribe(units => {
             this.itemUnits = units;
         })
     }
+
     editItem(item: any) {
         const dialogRef = this.dialog.open(ModalComponent, {
             width: '500px',
@@ -229,6 +450,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
             }
         });
     }
+
     private updateIndividualItem(item: any) {
         this.invoiceService.updateItemWithUnit(this.invoice.id, item.id, item).toPromise().then(() => {
             this.resetForm();
@@ -251,6 +473,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
             }
         });
     }
+
     private saveIndividualItem(item: any) {
         item = {
             ...item,
@@ -267,6 +490,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
             this.notification.error(null, err.error);
         });
     }
+
     resetForm() {
         this.invoice = null;
         //this.submitted_history = false;
@@ -274,13 +498,14 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
 
         //this.historyForm.reset();
 
-        while(this.InvoiceItems.length) {
+        while (this.InvoiceItems.length) {
             this.InvoiceItems.removeAt(0);
         }
 
         this.invoiceForm.reset({invoice_number: {value: '', disabled: true}});
         this.getInvoice(this.id);
     }
+
     private getCompanyInfo() {
         const id = this.sessionService.getActiveCompany().id;
 
@@ -345,9 +570,11 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
             })
             .catch(err => this.notification.error(null, err.error));
     }
+
     get InvoiceItems(): FormArray {
         return this.invoiceForm.get('InvoiceItems') as FormArray;
     }
+
     private arrayToForm(invoiceItems) {
         invoiceItems.sort((a, b) => a.id - b.id);
 
@@ -366,6 +593,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
             );
         });
     }
+
     private initForm() {
         this.submitted = false;
         this.invoiceForm = this.formBuilder.group({
@@ -384,7 +612,6 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
             .toPromise()
             .then(invoice => {
                 this.invoice = invoice;
-                console.log(this.invoice.InvoiceHistories)
                 this.invoice.Revenues = _orderBy(invoice.Revenues, ['id'], ['desc']);
                 this.revenus = this.invoice.Revenues
                 this.histories = this.invoice.InvoiceHistories
@@ -408,38 +635,27 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy{
                 this.notification.error(null, err.error);
             });
     }
+
     print(type) {
         const id = this.invoice.id
         if (type === 'A4') {
-            this.invoiceService.invoicePrint(id).subscribe(res=>{
-                console.log(res)
+            this.invoiceService.invoicePrint(id).subscribe(res => {
                 this.printService.invoice(this.invoice)
             })
-                /*.then(res => this.printService.invoice(this.invoice))
-                .catch(err => {
-                    console.log(err)
-                    this.notification.error(null, err.error)
-                });*/
         }
         else if (type === 'A4V2') {
-            this.invoiceService.invoicePrint(id).subscribe(res=>{
+            this.invoiceService.invoicePrint(id).subscribe(res => {
                 this.printService.invoiceV2(this.invoice)
             })
-                /*.then(res => this.printService.invoiceV2(this.invoice))
-                .catch(err => {
-                    this.notification.error(null, err.error)
-                });*/
         }
         else if (type === 'RECEIPT') {
             if (this.invoice.status !== 'PAID') {
                 this.notification.error(null, 'INVOICE_NOT_PAID');
             }
             else {
-                this.invoiceService.invoicePrint(id).subscribe(res=>{
+                this.invoiceService.invoicePrint(id).subscribe(res => {
                     this.printService.receipt(this.invoice)
                 })
-                    /*.then(res => this.printService.receipt(this.invoice))
-                    .catch(err => this.notification.error(null, err.error));*/
             }
         }
     }

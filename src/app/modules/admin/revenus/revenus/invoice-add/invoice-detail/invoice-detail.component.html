@@ -1,6 +1,11 @@
 <div class="flex flex-col flex-auto min-w-0">
     <div class="flex-auto p-6 sm:p-10">
         <div class="h-400 min-h-400 max-h-400 bg-card">
+            <button mat-button class="bg-primary text-white rounded-lg"
+                    [ngClass]="'bg-' + utilityService.statusStyle(invoice?.status).background + '-inverse'">
+                {{invoice?.status}}
+            </button>
+            <hr>
             <mat-tab-group class="sm:px-2" [animationDuration]="'0'">
                 <mat-tab label="FACTURE">
                     <form role="form" [formGroup]="invoiceForm" autocomplete="off" novalidate>
@@ -255,6 +260,7 @@
                                     <mat-icon>arrow_drop_down</mat-icon>
                                 </button>
                                 <mat-menu #menu="matMenu">
+                                    <button mat-menu-item (click)="settingsDrawer2.toggle(); openSidePanelPayment()">Ajouter un payment</button>
                                     <button mat-menu-item (click)="print('A4V2')">A4 Version 2</button>
                                     <button mat-menu-item (click)="print('RECEIPT')">Ticket caisse</button>
                                     <button mat-menu-item (click)="duplicate()">Dupliquer</button>
@@ -274,9 +280,90 @@
                                         [dataId]="invoice?.id"
                                         (onSubmit)="resetForm()"></invoice-historique>
                 </mat-tab>
-                <mat-tab class="text-green-500" label="{{invoice?.status}}" disabled></mat-tab>
 
             </mat-tab-group>
+
         </div>
     </div>
 </div>
+<fuse-drawer
+    class="w-screen min-w-screen sm:w-100 sm:min-w-100 z-999"
+    fixed
+    [mode]="'over'"
+    [name]="'settingsDrawer2'"
+    [position]="'right'"
+    #settingsDrawer2>
+
+    <div class="flex flex-col w-full overflow-auto bg-card">
+        <div class="flex flex-row items-center px-6 h-20 min-h-20 text-white bg-primary">
+            <mat-icon class="icon-size-7 text-current"
+                      [svgIcon]="'heroicons_solid:cog-8-tooth'"></mat-icon>
+            <div class="ml-3 text-2xl font-semibold tracking-tight">Ajouter</div>
+            <button
+                class="ml-auto"
+                mat-icon-button
+                (click)="settingsDrawer2.close()">
+                <mat-icon
+                    class="text-current"
+                    [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+            </button>
+        </div>
+        <div class="flex flex-col p-6">
+            <form role="form" [formGroup]="form" autocomplete="off" novalidate (ngSubmit)="save()">
+                <div class="flex">
+                    <mat-form-field [ngClass]="formFieldHelpers" class="flex-auto">
+                        <mat-label>Date</mat-label>
+                        <input formControlName="paid_at" matInput [matDatepicker]="picker3">
+                        <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                        <mat-datepicker #picker3></mat-datepicker>
+                    </mat-form-field>
+                </div>
+                <div class="flex">
+                    <mat-form-field
+                        [ngClass]="formFieldHelpers"
+                        class="flex-auto">
+                        <mat-label>Montant</mat-label>
+                        <input type="number" formControlName="amount" matInput>
+                        <span matPrefix>Ar&nbsp;</span>
+                        <span matSuffix>.00</span>
+                    </mat-form-field>
+                </div>
+                <div class="flex">
+                    <mat-form-field appearance="fill"
+                                    [ngClass]="formFieldHelpers"
+                                    class="flex-auto gt-xs:pl-3">
+                        <mat-label>Compte</mat-label>
+                        <mat-select formControlName="account_id" [ngClass]="{'error': submitted && form.controls.account_id.invalid}">
+                            <mat-option *ngFor="let item of accounts" [value]="item.id">
+                                {{ item.id }} - {{ item.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="flex">
+                    <mat-form-field appearance="fill"
+                                    [ngClass]="formFieldHelpers"
+                                    class="flex-auto gt-xs:pl-3">
+                        <mat-label>Mode de Payment</mat-label>
+                        <mat-select formControlName="payment_method" [ngClass]="{'error': submitted && form.controls.account_id.invalid}">
+                            <mat-option *ngFor="let item of appService.paymentMethods" [value]="item.code">
+                                {{ item.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="flex">
+                    <mat-form-field
+                        [ngClass]="formFieldHelpers"
+                        class="fuse-mat-textarea flex-auto">
+                        <mat-label>Description</mat-label>
+                        <textarea matInput formControlName = "description"></textarea>
+                    </mat-form-field>
+                </div>
+                <button type="submit" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
+                focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600
+                dark:hover:bg-green-700 dark:focus:ring-green-800" (click)="settingsDrawer2.close()">Ajouter</button>
+            </form>
+        </div>
+    </div>
+</fuse-drawer>
