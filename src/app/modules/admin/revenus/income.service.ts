@@ -20,4 +20,8 @@ export class IncomeService {
         const url = [AppService.API, 'incomes', id].join('/');
         return this.http.get<Revenue>(url);
     }
+    create(revenue: Revenue): Observable<Revenue> {
+        const url = [AppService.API, 'incomes'].join('/');
+        return this.http.post<Revenue>(url, revenue);
+    }
 }

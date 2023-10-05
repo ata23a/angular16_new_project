@@ -4,96 +4,254 @@
     <div class="flex-auto p-6 sm:p-10">
 
         <!-- CONTENT GOES HERE -->
-        <div class="h-400  min-h-400 max-h-400 ">
+        <div class="h-400  min-h-400 max-h-400 bg-card">
+
             <form [formGroup]="dateForm" (submit)="submit()">
                 <div class="row mrg-btm-15 border-radius-4 border-white border-danger">
                     <div class="input-group">
-                        <mat-form-field color="accent" class="mr-5 w-90">
-                            <input matInput [matDatepicker]="picker1" class="form-control input-sm bg-white" formControlName="start">
-                            <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
-                            <mat-datepicker #picker1 color="primary"></mat-datepicker>
-                        </mat-form-field>
-                        <mat-form-field color="accent" class="mr-10 w-90">
-                            <input matInput [matDatepicker]="picker2" class="form-control input-sm bg-white w-48 mr-15" formControlName="end">
-                            <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
-                            <mat-datepicker #picker2 color="primary"></mat-datepicker>
-                        </mat-form-field>
-                        <button class="mat-elevation-z0 mr-1 " mat-mini-fab color="primary" type="submit" aria-label="Example icon button with a filter list icon">
-                            <mat-icon>search</mat-icon>
-                        </button>
-                        <button class="mat-elevation-z0 mr-1 " mat-mini-fab color="primary" aria-label="Example icon button with a filter list icon" (click)="resetForm()">
-                            <mat-icon>refresh</mat-icon>
-                        </button>
+                        <div class="flex justify-start ...">
+                            <div>
+                                <mat-form-field color="accent" class="mr-5 w-90">
+                                    <input matInput [matDatepicker]="picker1" class="form-control input-sm bg-white" formControlName="start">
+                                    <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker1 color="primary"></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                            <div>
+                                <mat-form-field color="accent" class="mr-10 w-90">
+                                    <input matInput [matDatepicker]="picker2" class="form-control input-sm bg-white w-48 mr-15" formControlName="end">
+                                    <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker2 color="primary"></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                            <div>
+                                <button class="mat-elevation-z0 mr-1 " mat-mini-fab color="primary" type="submit" aria-label="Example icon button with a filter list icon">
+                                    <mat-icon>search</mat-icon>
+                                </button>
+                            </div>
+                            <div>
+                                <button class="mat-elevation-z0 mr-1 " mat-mini-fab color="primary" aria-label="Example icon button with a filter list icon" (click)="resetForm()">
+                                    <mat-icon>refresh</mat-icon>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
-
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full min-w-0">
-                <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                    {{summary2.InvoicePaymentSummary?.total}} : Totale paiements
+            <hr class="-mt-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-8">
+            <div class="sm:col-span-2 lg:col-span-1 flex flex-col flex-auto bg-sky-200 shadow rounded-2xl overflow-hidden">
+                <div class="flex items-start justify-between m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Totale paiements:</div>
                 </div>
-
-                <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                    {{summary2.InvoiceSummary?.total}} : Totale factures
-                </div>
-
-                <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                    {{summary2.InvoiceSummary?.balance}} : Montant factures impayés
+                <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
+                    <div class="text-5xl ml-15 tracking-tighter leading-tight">{{summary2.InvoicePaymentSummary?.total?.toLocaleString('fr-FR')}}&nbsp;&nbsp; MGA</div>
                 </div>
             </div>
+            <!-- Impressions -->
+            <div class="flex flex-col flex-auto bg-sky-200 shadow rounded-2xl overflow-hidden">
+                <div class="flex items-start justify-between m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Totale factures:</div>
+                </div>
+                <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
+                    <div class="text-5xl ml-15 tracking-tighter leading-tight">{{summary2.InvoiceSummary?.total?.toLocaleString('fr-FR')}}&nbsp;&nbsp; MGA </div>
+                </div>
+            </div>
+            <!-- Visits -->
+            <div class="flex flex-col flex-auto bg-sky-200 shadow rounded-2xl overflow-hidden">
+                <div class="flex items-start justify-between m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Montant factures impayés:</div>
+                </div>
+                <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
+                    <div class="text-5xl ml-15 tracking-tighter leading-tight">{{summary2.InvoiceSummary?.balance?.toLocaleString('fr-FR')}}&nbsp;&nbsp; MGA</div>
+                </div>
+            </div>
+            </div>
+            <hr>
 
-            <div class="mt-8">
-                <div class="example-container mat-elevation-z8">
-                    <div class="example-table-container">
-                        <table mat-table [dataSource]="data" class="example-table"
-                               matSort matSortActive="created_at" matSortDisableClear matSortDirection="desc">
-                            <!-- Number Column -->
-                            <ng-container matColumnDef="payé le">
-                                <th mat-header-cell *matHeaderCellDef> Payé le </th>
-                                <td mat-cell *matCellDef="let row">{{ row.paid_at | date }}</td>
-                            </ng-container>
+            <mat-tab-group>
+                <mat-tab label="PAIEMENTS">
+                    <div class="mt-8">
+                        <div class="example-container mat-elevation-z8">
+                            <div class="example-table-container">
+                                <button class="btn btn-sm btn-info mr-0 pull-right" (click)="settingsDrawer4.toggle()">
+                                    Ajouter revenus
+                                </button>
+                                <table mat-table [dataSource]="data" class="example-table"
+                                       matSort matSortActive="created_at" matSortDisableClear matSortDirection="desc">
+                                    <!-- Number Column -->
+                                    <ng-container matColumnDef="payé le">
+                                        <th mat-header-cell *matHeaderCellDef> Payé le </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{ row.paid_at | date }}
+                                            <span class="text-opacity-6 block text-xs">ID: {{row.id}}</span>
+                                        </td>
+                                    </ng-container>
 
-                            <ng-container matColumnDef="contact">
-                                <th mat-header-cell *matHeaderCellDef> Contact </th>
-                                <td mat-cell *matCellDef="let row">{{ row.contact_name }}</td>
-                            </ng-container>
+                                    <ng-container matColumnDef="contact">
+                                        <th mat-header-cell *matHeaderCellDef> Contact </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <a href [routerLink]="['/invoiceDetail', row.id]" *ngIf="row.id">{{ row.contact_name }}</a>
+                                            <span *ngIf="row?.type === 'INVOICE_PAYMENT'" class="text-opacity-6 block text-xs">
+                                                <i class="fa fa-file-archive-o text-primary mr-1" aria-hidden="true"></i> Facture n°
+                                                {{row.invoice_id}}
+                                    </span>
+                                        </td>
+                                    </ng-container>
 
-                            <ng-container matColumnDef="catégorie">
-                                <th mat-header-cell *matHeaderCellDef> Catégorie </th>
-                                <td mat-cell *matCellDef="let row">{{ row.Category.name }}</td>
-                            </ng-container>
+                                    <ng-container matColumnDef="catégorie">
+                                        <th mat-header-cell *matHeaderCellDef> Catégorie </th>
+                                        <td mat-cell *matCellDef="let row">{{ row.Category.name }}</td>
+                                    </ng-container>
 
-                            <ng-container matColumnDef="description">
-                                <th mat-header-cell *matHeaderCellDef> Description </th>
-                                <td mat-cell *matCellDef="let row">{{ row.description }}</td>
-                            </ng-container>
+                                    <ng-container matColumnDef="description">
+                                        <th mat-header-cell *matHeaderCellDef> Description </th>
+                                        <td mat-cell *matCellDef="let row">{{ row.description }}</td>
+                                    </ng-container>
 
-                            <ng-container matColumnDef="compte">
-                                <th mat-header-cell *matHeaderCellDef> Compte </th>
-                                <td mat-cell *matCellDef="let row">{{ row.Account.name }}</td>
-                            </ng-container>
+                                    <ng-container matColumnDef="compte">
+                                        <th mat-header-cell *matHeaderCellDef> Compte </th>
+                                        <td mat-cell *matCellDef="let row">{{ row.Account.name }}</td>
+                                    </ng-container>
 
-                            <ng-container matColumnDef="montant">
-                                <th mat-header-cell *matHeaderCellDef> Montant </th>
-                                <td mat-cell *matCellDef="let row">{{ row.amount }}</td>
-                            </ng-container>
+                                    <ng-container matColumnDef="montant">
+                                        <th mat-header-cell *matHeaderCellDef> Montant </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{ row.amount.toLocaleString('fr-FR')}}&nbsp;MGA
+                                            <span class="text-opacity-6 block text-xs">
+                                        {{row.payment_method}}
+                                    </span>
+                                        </td>
+                                    </ng-container>
 
-                            <ng-container matColumnDef="créer le">
-                                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear> Créé le </th>
-                                <td mat-cell *matCellDef="let row">{{ row.created_at | date}}</td>
-                            </ng-container>
+                                    <ng-container matColumnDef="créer le">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear> Créé par </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{ row.User.name}}
+                                            <span class="text-opacity-6 block text-xs">
+                                        {{row.created_at | date:'dd MMM yyyy HH:mm'}}
+                                    </span>
+                                        </td>
+                                    </ng-container>
 
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                        </table>
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                                </table>
+                            </div>
+
+                            <mat-paginator [length]="resultsLength" [pageSize]="size" aria-label="Select page of GitHub search results"></mat-paginator>
+                        </div>
                     </div>
-
-                    <mat-paginator [length]="resultsLength" [pageSize]="size" aria-label="Select page of GitHub search results"></mat-paginator>
-                </div>
-            </div>
+                </mat-tab>
+                <mat-tab label="FACTURES">
+                    <app-invoice-list></app-invoice-list>
+                </mat-tab>
+            </mat-tab-group>
         </div>
 
     </div>
 
 </div>
+
+<fuse-drawer
+    class="w-screen min-w-screen sm:w-100 sm:min-w-100 z-999"
+    fixed
+    [mode]="'over'"
+    [name]="'settingsDrawer2'"
+    [position]="'right'"
+    #settingsDrawer4>
+
+    <div class="flex flex-col w-full overflow-auto bg-card">
+        <div class="flex flex-row items-center px-6 h-20 min-h-20 text-white bg-primary">
+            <mat-icon class="icon-size-7 text-current"
+                      [svgIcon]="'heroicons_solid:cog-8-tooth'"></mat-icon>
+            <div class="ml-3 text-2xl font-semibold tracking-tight">Nouveau revenus</div>
+            <button
+                class="ml-auto"
+                mat-icon-button
+                (click)="settingsDrawer4.close()">
+                <mat-icon
+                    class="text-current"
+                    [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+            </button>
+        </div>
+        <div class="flex flex-col p-6">
+            <form role="form" [formGroup]="addRevenueForm" autocomplete="off" novalidate (ngSubmit)="save()">
+                <div class="flex">
+                    <mat-form-field [ngClass]="formFieldHelpers" class="flex-auto">
+                        <mat-label>Date</mat-label>
+                        <input formControlName="paid_at" matInput [matDatepicker]="picker">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                </div>
+                <div class="flex">
+                    <mat-form-field appearance="fill"
+                                    [ngClass]="formFieldHelpers"
+                                    class="flex-auto gt-xs:pl-3">
+                        <mat-label>Catégorie</mat-label>
+                        <mat-select formControlName="category_id" [ngClass]="{'error': submitted && addRevenueForm.controls.account_id.invalid}">
+                            <mat-option *ngFor="let item of categories" [value]="item.id">
+                                {{ item.id }} - {{ item.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="flex">
+                    <mat-form-field appearance="fill"
+                                    [ngClass]="formFieldHelpers"
+                                    class="flex-auto gt-xs:pl-3">
+                        <mat-label>Compte</mat-label>
+                        <mat-select formControlName="account_id" [ngClass]="{'error': submitted && addRevenueForm.controls.account_id.invalid}">
+                            <mat-option *ngFor="let item of accounts" [value]="item.id">
+                                {{ item.id }} - {{ item.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="flex">
+                    <div appearance="fill"
+                                    [ngClass]="formFieldHelpers"
+                                    class="flex-auto gt-xs:pl-3">
+                        <mat-label>Contact</mat-label> <br>
+                        <app-typehead-contact formControlName="contact" [submitted]="submitted"></app-typehead-contact>
+                    </div>
+                </div>
+                <div class="flex">
+                    <mat-form-field
+                        [ngClass]="formFieldHelpers"
+                        class="flex-auto">
+                        <mat-label>Montant</mat-label>
+                        <input type="number" formControlName="amount" matInput>
+                        <span matPrefix>Ar&nbsp;</span>
+                        <span matSuffix>.00</span>
+                    </mat-form-field>
+                </div>
+                <div class="flex">
+                    <mat-form-field appearance="fill"
+                                    [ngClass]="formFieldHelpers"
+                                    class="flex-auto gt-xs:pl-3">
+                        <mat-label>Mode de Payment</mat-label>
+                        <mat-select formControlName="payment_method" [ngClass]="{'error': submitted && addRevenueForm.controls.account_id.invalid}">
+                            <mat-option *ngFor="let item of appService.paymentMethods" [value]="item.code">
+                                {{ item.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="flex">
+                    <mat-form-field
+                        [ngClass]="formFieldHelpers"
+                        class="fuse-mat-textarea flex-auto">
+                        <mat-label>Description</mat-label>
+                        <textarea matInput formControlName = "description"></textarea>
+                    </mat-form-field>
+                </div>
+                <button type="submit" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
+                focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600
+                dark:hover:bg-green-700 dark:focus:ring-green-800" (click)="settingsDrawer4.close()">Ajouter</button>
+
+            </form>
+        </div>
+    </div>
+</fuse-drawer>
