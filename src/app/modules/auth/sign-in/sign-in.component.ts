@@ -99,12 +99,12 @@ export class AuthSignInComponent implements OnInit {
                             config: res['config']
                         }));
 
-                        let layout = 'bus'; // Par défaut
+                        /*let layout = 'bus'; // Par défaut
                         if (formValue.api === 'https://api.capsule.mg/pascoma') {
                             layout = 'hotel';
                         }
 
-                        this.setLayout(layout)
+                        this.setLayout(layout)*/
 
                         Swal.fire({
                             toast: true,
