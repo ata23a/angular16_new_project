@@ -239,6 +239,7 @@ export class FuseDrawerComponent implements OnChanges, OnInit, OnDestroy
      */
     open(): void
     {
+        console.log('AAAA')
         // Return if the drawer has already opened
         if ( this.opened )
         {

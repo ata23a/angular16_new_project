@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import Revenue from "../../../../../core/model/revenue";
 import {DatePipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {NgbTooltip} from "@ng-bootstrap/ng-bootstrap";
@@ -60,6 +60,7 @@ import {AccountService} from "../../../../../core/services/account/account.servi
 export class ListPaymentComponent implements OnInit{
     @Input() facture: any;
     @Input() dataTable: Revenue[];
+    rewardForm: FormGroup;
     form: FormGroup;
     accounts: Array<Account>;
     formFieldHelpers: string[] = [''];
@@ -77,6 +78,7 @@ export class ListPaymentComponent implements OnInit{
         'created_at'
     ];
     subscription = new Subscription();
+    @ViewChild('drawer') drawer: FuseDrawerComponent;
     constructor(
         public appService: AppService,
         private accountingService: AccountingService,
@@ -157,6 +159,7 @@ export class ListPaymentComponent implements OnInit{
             payment_method: payment.payment_method
         });
         this.accountingService.sidePanelPayment.next(true);
+        this.drawer.toggle()
     }
     exportToExcel(data: any, filename: any) {
         const mapped = data.map(item => {
@@ -188,6 +191,21 @@ export class ListPaymentComponent implements OnInit{
             payment_method: [null, Validators.required]
         });
     }
+    close() {
+        const cT = moment().toDate();
+
+        this.submitted = false;
+        this.form.reset({
+            paid_at: {value: cT, disabled: true}
+        });
+        this.rewardForm?.reset({
+            paid_at: {value: cT, disabled: true}
+        });
+        this.accountingService.facture.next(null);
+        this.accountingService.payment.next(null);
+        this.accountingService.sidePanelPayment.next(false);
+        this.drawer.close()
+    }
 
     save() {
         this.submitted = true;
@@ -209,6 +227,7 @@ export class ListPaymentComponent implements OnInit{
 
                     this.subscription.add(
                         this.incomeService.get(res.id).subscribe(payment => {
+                            this.close()
                             Swal.fire({
                                 toast: true,
                                 position: 'top',

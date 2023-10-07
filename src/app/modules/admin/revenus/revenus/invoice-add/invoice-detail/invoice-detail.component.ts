@@ -52,6 +52,7 @@ import {PipeService} from "../../../../../../core/services/pipe/pipe.service";
 import {AccountService} from "../../../../../../core/services/account/account.service";
 import Swal from "sweetalert2";
 import {UtilityService} from "../../../../../../core/services/utility/utility.service";
+import {MatTableDataSource, MatTableModule} from "@angular/material/table";
 
 registerLocaleData(localeFr);
 
@@ -90,10 +91,12 @@ registerLocaleData(localeFr);
         CurrencyPipe,
         InvoiceHistoriqueComponent,
         FuseDrawerComponent,
+        MatTableModule,
     ],
     styleUrls: ['./invoice-detail.component.scss']
 })
 export class InvoiceDetailComponent implements OnInit, OnDestroy {
+    displayedColumns: string[] = ['actions', 'name', 'unit', 'quantity', 'price', 'taxes', 'total'];
     subscription = new Subscription();
     invoice: Invoice;
     id;
@@ -122,6 +125,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
     formFieldHelpers: string[] = [''];
     sidePanelOpen: boolean;
     @ViewChild('drawer') drawer: FuseDrawerComponent;
+    @ViewChild('payment') payment: ListPaymentComponent;
 
     constructor(
         public appService: AppService,
@@ -162,6 +166,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
     openSidePanelPayment() {
         this.accountingService.facture.next(this.invoice);
         this.accountingService.sidePanelPayment.next(true);
+        this.drawer.toggle()
     }
 
     private onSubscribe() {
@@ -255,6 +260,22 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
         }
     }
 
+    close() {
+        const cT = moment().toDate();
+
+        this.submitted = false;
+        this.form.reset({
+            paid_at: {value: cT, disabled: true}
+        });
+        this.rewardForm.reset({
+            paid_at: {value: cT, disabled: true}
+        });
+        this.accountingService.facture.next(null);
+        this.accountingService.payment.next(null);
+        this.accountingService.sidePanelPayment.next(false);
+        this.drawer.close()
+    }
+
     save() {
         this.submitted = true;
 
@@ -277,6 +298,8 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
 
                     this.subscription.add(
                         this.incomeService.get(res.id).subscribe(payment => {
+                            this.close()
+                            this.refreshPayment(this.id)
                             Swal.fire({
                                 toast: true,
                                 position: 'top',
@@ -605,6 +628,14 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
             notes: null,
             InvoiceItems: this.formBuilder.array([])
         });
+    }
+
+    private refreshPayment(id){
+        this.invoiceService.get(id).subscribe(res=>{
+            this.invoice = res;
+            this.invoice.Revenues = _orderBy(res.Revenues, ['id'], ['desc']);
+            this.revenus = this.invoice.Revenues
+        })
     }
 
     private getInvoice(id) {

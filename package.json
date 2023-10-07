@@ -35,6 +35,7 @@
     "bootstrap": "^5.2.3",
     "convertir-nombre-lettre": "^1.0.2",
     "crypto-js": "3.3.0",
+    "daterangepicker": "^3.1.0",
     "file-saver": "^2.0.5",
     "highlight.js": "11.8.0",
     "lodash-es": "4.17.21",

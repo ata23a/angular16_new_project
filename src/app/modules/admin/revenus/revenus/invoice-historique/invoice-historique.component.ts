@@ -7,6 +7,7 @@ import {NotificationService} from "../../../../../core/services/notifications/no
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import _orderBy from 'lodash.orderby';
 import {MatTableDataSource, MatTableModule} from "@angular/material/table";
+import {MatIconModule} from "@angular/material/icon";
 
 @Component({
     selector: 'invoice-historique',
@@ -18,6 +19,7 @@ import {MatTableDataSource, MatTableModule} from "@angular/material/table";
         NgIf,
         NgForOf,
         MatTableModule,
+        MatIconModule,
     ],
     styleUrls: ['./invoice-historique.component.scss']
 })
@@ -47,7 +49,7 @@ export class InvoiceHistoriqueComponent implements OnInit, OnChanges{
         this.initForm()
     }
     ngOnChanges(changes: SimpleChanges): void {
-        this.sortedData = _orderBy(changes.dataTable.currentValue,['created_at'] , ['desc']);
+        this.sortedData = _orderBy(changes.dataTable?.currentValue,['created_at'] , ['desc']);
     }
 
     saveHistory() {

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {InvoiceService} from "../../../../../core/services/invoice/invoice.service";
 import _filter from "lodash/filter";
 import Invoice from "../../../../../core/model/invoice";
@@ -28,6 +28,7 @@ import {
 } from "rxjs";
 import {RouterLink} from "@angular/router";
 import {DatePipe} from "@angular/common";
+import {MatTabsModule} from "@angular/material/tabs";
 
 @Component({
     selector: 'app-invoice-list',
@@ -45,7 +46,8 @@ import {DatePipe} from "@angular/common";
         MatInputModule,
         RouterLink,
         DatePipe,
-        FormsModule
+        FormsModule,
+        MatTabsModule
     ],
     styleUrls: ['./invoice-list.component.scss']
 })
@@ -55,9 +57,9 @@ export class InvoiceListComponent implements OnInit, AfterViewInit{
     drafts: Invoice[] = [];
     paidInvoices: Invoice[] = [];
     displayedColumns: string[] = ['Numero', 'contact', 'reservation', 'categorie', 'total', 'impaye', 'date_facture', 'creer_le'];
-    dateForm: FormGroup;
+    @Input() dateForm: FormGroup;
     dateFormSubmitted = false;
-    data: any[];
+    @Input() data: any[];
     resultsLength = 0;
     size = 0;
     isLoadingResults = false;
@@ -66,11 +68,6 @@ export class InvoiceListComponent implements OnInit, AfterViewInit{
     searchDescriptionUpdate = new Subject<string>()
     ngOnInit(): void {
         this.debounceInputDescription()
-        this.initForm()
-        this.fetchDrafts({
-            start: moment(this.dateForm.controls.start.value).format(),
-            end: moment(this.dateForm.controls.end.value).format()
-        })
     }
     loadDataBillDefaultConfig() {
         this.isLoadingResults = true
@@ -177,8 +174,7 @@ export class InvoiceListComponent implements OnInit, AfterViewInit{
         private notification: NotificationService,
         private formBuilder: FormBuilder,
         private sessionService: SessionService,
-    ) {
-    }
+    ) {}
 
 
     getSummary() {
@@ -200,7 +196,7 @@ export class InvoiceListComponent implements OnInit, AfterViewInit{
                         }
                     ]
                 },
-                sort: {},
+                sort: {pointer: "created_at", direction: "desc"},
                 slice: {
                     page: this.paginator.pageIndex + 1,
                     size: 25
@@ -209,7 +205,6 @@ export class InvoiceListComponent implements OnInit, AfterViewInit{
             }
             this.invoiceService.summary(filterConfig).pipe(
                 map((res)=>{
-                    console.log(res)
                     this.isLoadingResults = false
                     this.resultsLength = res.summary.filteredCount;
                     this.size = res.summary.size
@@ -218,12 +213,11 @@ export class InvoiceListComponent implements OnInit, AfterViewInit{
             ).subscribe()
         }
     }
-    private fetchDrafts(dateParams?: any) {
+    fetchDrafts(dateParams?: any) {
         this.invoiceService.drafts(dateParams)
             .then(invoices => {
                 this.data = invoices
                 this.drafts = _filter(invoices, {status: 'DRAFT'});
-                console.log(this.drafts)
                 this.paidInvoices = _filter(invoices, invoice => invoice.balance <= 0);
             })
             .catch(err => this.notification.error(null, err.error));

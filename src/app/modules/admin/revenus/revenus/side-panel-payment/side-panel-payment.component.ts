@@ -50,7 +50,6 @@ export class SidePanelPaymentComponent implements OnInit, OnDestroy {
         private accountService: AccountService,
         private billService: BillService,
         private expenseService: ExpenseService,
-        //private firstNamePipe: FirstNamePipe,
         private formBuilder: FormBuilder,
         private incomeService: IncomeService,
         private invoiceService: InvoiceService,

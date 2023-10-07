@@ -25,7 +25,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 id   : 'facturation',
                 title: 'Facturation',
                 type : 'basic',
-                link : '/invoiceList'
+                link : '/facturation'
             },
             {
                 id   : 'recherche',

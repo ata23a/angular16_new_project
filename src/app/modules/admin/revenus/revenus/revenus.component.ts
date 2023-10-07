@@ -1,10 +1,19 @@
-import {AfterViewInit, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    EventEmitter,
+    OnInit,
+    Output,
+    QueryList,
+    ViewChild,
+    ViewChildren
+} from '@angular/core';
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatNativeDateModule, MatOptionModule} from "@angular/material/core";
 import {MatDatepickerModule} from "@angular/material/datepicker";
 import {MatIconModule} from "@angular/material/icon";
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import * as moment from 'moment';
 import {IncomeService} from "../income.service";
 import {NotificationService} from "../../../../core/services/notifications/notification.service";
@@ -12,14 +21,25 @@ import {AppModule} from "../../../../app.module";
 import {RevenusSammaryTableComponent} from "./revenus-sammary-table/revenus-sammary-table.component";
 import {MatButtonModule} from "@angular/material/button";
 import {MatMenuModule} from "@angular/material/menu";
-import {DatePipe, NgClass, NgForOf, NgIf} from "@angular/common";
+import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {MatPaginator, MatPaginatorModule} from "@angular/material/paginator";
 import {MatSort, MatSortModule} from "@angular/material/sort";
 import {MatTableModule} from "@angular/material/table";
-import {catchError, map, merge, of as observableOf, startWith, Subscription, switchMap} from "rxjs";
+import {
+    async,
+    catchError,
+    debounceTime, distinctUntilChanged,
+    map,
+    merge, Observable,
+    of as observableOf,
+    startWith,
+    Subject,
+    Subscription,
+    switchMap
+} from "rxjs";
 import {ItemService} from "../../../../core/services/item/item.service";
 import {RouterLink} from "@angular/router";
-import {MatTabsModule} from "@angular/material/tabs";
+import {MatTab, MatTabsModule} from "@angular/material/tabs";
 import {InvoiceListComponent} from "./invoice-list/invoice-list.component";
 import {FuseDrawerComponent} from "../../../../../@fuse/components/drawer";
 import {MatSelectModule} from "@angular/material/select";
@@ -34,6 +54,8 @@ import _orderBy from "lodash/orderBy";
 import Account from "../../../../core/model/account";
 import {AccountService} from "../../../../core/services/account/account.service";
 import {AppService} from "../../../../core/services/app/app.service";
+import {MatAutocompleteModule} from "@angular/material/autocomplete";
+import {ContactService} from "../../../../core/services/contact/contact.service";
 
 @Component({
   selector: 'app-revenus',
@@ -63,10 +85,16 @@ import {AppService} from "../../../../core/services/app/app.service";
         MatOptionModule,
         MatSelectModule,
         NgForOf,
-        NgClass
+        NgClass,
+        MatAutocompleteModule,
+        FormsModule,
+        AsyncPipe
     ]
 })
 export class RevenusComponent implements AfterViewInit{
+    inputDebounceSearch = new Subject<string>()
+    searchTerm = '';
+    filteredOptions: Observable<any>
     dateForm: FormGroup;
     addRevenueForm: FormGroup;
     dateFormSubmitted: boolean;
@@ -76,10 +104,14 @@ export class RevenusComponent implements AfterViewInit{
     data: [] = [];
     resultsLength = 0;
     size = 0;
+    searchDisplayColumns: string[] = ['columnOne', 'searchContact', 'searchCategory', 'searchDescription', 'columnFive', 'searchAmount', 'columnSeven']
     displayedColumns: string[] = ['payé le', 'contact', 'catégorie', 'description', 'compte', 'montant', 'créer le'];
+    displayedColumns2: string[] = ['Numero', 'contact', 'reservation', 'categorie', 'total', 'impaye', 'date_facture', 'creer_le'];
     summary: any[];
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
+    @ViewChildren(MatTab) tabs: QueryList<MatTab>;
+    @ViewChild('invoiceListComponent') private invoiceListComponent :InvoiceListComponent
     isLoadingResults = false;
     isRateLimitReached = false;
     selectedRevenue: Revenue;
@@ -88,6 +120,14 @@ export class RevenusComponent implements AfterViewInit{
     formFieldHelpers: string[] = [''];
     categories: Array<Category>;
     accounts: Array<Account>;
+    searchCategoryControl = new FormControl('');
+    searchAmountControl = new FormControl('')
+    searchDescription: string;
+    searchDescriptionUpdate = new Subject<string>()
+    paymentMethods: any[]
+    activeTabIndex: number = 0;
+
+
     constructor(
         private formBuilder: FormBuilder,
         private incomeService: IncomeService,
@@ -97,7 +137,9 @@ export class RevenusComponent implements AfterViewInit{
         private jsPrintService: JsPrintService,
         private categoryService: CategoryService,
         private accountService: AccountService,
-        public appService: AppService
+        public appService: AppService,
+        private contactService: ContactService,
+        private invoiceService: IncomeService
     ) {
     }
     ngOnInit(){
@@ -119,14 +161,196 @@ export class RevenusComponent implements AfterViewInit{
             .catch(err => {
 
             });
+        this.debounceInputContact()
+        this.debounceInputDescription()
+        this.paymentMethods = this.appService.paymentMethods;
     }
+
+    onTabChange(event: any) {
+        console.log(event)
+        this.activeTabIndex = event;
+    }
+    onSelectPaymentMethod(event: any) {
+        console.log(event)
+        this.isLoadingResults = true
+        const config = {
+            filter: {
+                payment_method: [{
+                    operator: "equals",
+                    type: "string",
+                    value: event.code
+                }]
+            },
+            sort: {
+                direction: this.sort.direction,
+                pointer: this.sort.active
+            },
+            slice: {
+                page: this.paginator.pageIndex + 1,
+                size: 25
+            },
+            search: {}
+        }
+        this.itemService.paginate(config).pipe(
+            map((res) => {
+                this.data = res.data
+                this.resultsLength = res.summary.filteredCount;
+                this.size = res.summary.size
+                this.isLoadingResults = false
+            })
+        ).subscribe()
+    }
+
+    loadDataBillDefaultConfig() {
+        this.isLoadingResults = true
+        const tableState = {
+            filter: {},
+            sort: {
+                direction: this.sort.direction,
+                pointer: this.sort.active
+            },
+            slice: {
+                page: this.paginator.pageIndex + 1,
+                size: 25
+            },
+            search: {}
+        }
+        this.itemService.paginate(tableState).pipe(
+            map((res) => {
+                this.isLoadingResults = false
+                this.data = res.data
+            })
+        ).subscribe()
+    }
+    debounceInputDescription() {
+        this.searchDescriptionUpdate.pipe(
+            debounceTime(900),
+            distinctUntilChanged())
+            .subscribe(value => {
+                if (!value) {
+                    this.loadDataBillDefaultConfig()
+                }
+                else {
+                    this.isLoadingResults = true
+                    const config = {
+                        filter: {},
+                        search: {
+                            value: value,
+                            scope: ['description'],
+                            flags: 'i',
+                            escape: false
+                        },
+                        sort: {
+                            direction: this.sort.direction,
+                            pointer: this.sort.active
+                        },
+                        slice: {
+                            page: this.paginator.pageIndex + 1,
+                            size: 25
+                        }
+                    }
+                    this.itemService.paginate(config).pipe(
+                        map((res) => {
+                            this.data = res.data
+                            this.resultsLength = res.summary.filteredCount;
+                            this.size = res.summary.size
+                            this.isLoadingResults = false
+                        })
+                    ).subscribe()
+                }
+            });
+    }
+    debounceInputContact() {
+        this.inputDebounceSearch.pipe(
+            debounceTime(900),
+            distinctUntilChanged())
+            .subscribe(value => {
+                if (value) {
+                    this.filteredOptions = this.contactService.select(value.trim().toLowerCase())
+                }
+            });
+    }
+    onOptionSelected(event: any): void {
+        this.isLoadingResults = true
+        const user_id = +event.option.id;
+        const config = {
+            filter: {
+                contact_id: [{
+                    operator: "equals",
+                    type: "number",
+                    value: user_id
+                }],
+                created_at: [{
+                    value: this.dateForm.value.start,
+                    operator: 'gte',
+                    type: 'string'
+                },
+                    {
+                        value: this.dateForm.value.end,
+                        operator: 'lte',
+                        type: 'string'
+                    }
+                ]
+            },
+            sort: {
+                direction: this.sort.direction,
+                pointer: this.sort.active
+            },
+            slice: {
+                page: this.paginator.pageIndex + 1,
+                size: 25
+            },
+            search: {}
+        }
+        this.itemService.paginate(config).pipe(
+            map((res) => {
+                this.isLoadingResults = false
+                this.resultsLength = res.summary.filteredCount;
+                this.size = res.summary.size
+                this.data = res.data
+            })
+        ).subscribe()
+
+    }
+    onSelectionCategoryChange(event: any): void {
+        this.isLoadingResults = true
+
+        const category_id = +event.id;
+        const config = {
+            filter: {
+                category_id: [{
+                    operator: "equals",
+                    type: "number",
+                    value: category_id
+                }]
+            },
+            sort: {
+                direction: this.sort.direction,
+                pointer: this.sort.active
+            },
+            slice: {
+                page: this.paginator.pageIndex + 1,
+                size: 25
+            },
+            search: {}
+        }
+        this.itemService.paginate(config).pipe(
+            map((res) => {
+                this.data = res.data
+                this.resultsLength = res.summary.filteredCount;
+                this.size = res.summary.size
+                this.isLoadingResults = false
+            })
+        ).subscribe()
+    }
+
+
 
     save() {
         this.submitted = true;
 
         if (this.addRevenueForm.valid) {
             const formValue = this.addRevenueForm.getRawValue();
-
             if (this.selectedRevenue) {
                 this.sidePanelOpen = false;
                 Swal.fire({
@@ -167,7 +391,7 @@ export class RevenusComponent implements AfterViewInit{
                                     type: 'CREDIT',
                                     user_name: `${this.firstNamePipe.transform(this.sessionService.getUser().name)}.`
                                 });
-
+                                this.loadInitialData();
                                 //this.reset()
                                 Swal.fire({
                                     toast: true,
@@ -194,7 +418,7 @@ export class RevenusComponent implements AfterViewInit{
                             icon: 'error', showConfirmButton: false, timer: 3000,
                         })
 
-                    })//this.notification.error(null, err.error));
+                    })
             }
         }
         else {
@@ -250,36 +474,39 @@ export class RevenusComponent implements AfterViewInit{
         });
     }
     submit(){
-        this.isLoadingResults = true
-        this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-        const filterConfig = {
-            filter: {
-                created_at: [{
-                    value: this.dateForm.value.start,
-                    operator: 'gte',
-                    type: 'string'
-                },
-                    {
-                        value: this.dateForm.value.end,
-                        operator: 'lte',
+        if (this.activeTabIndex === 0){
+            this.isLoadingResults = true
+            this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+            const filterConfig = {
+                filter: {
+                    created_at: [{
+                        value: this.dateForm.value.start,
+                        operator: 'gte',
                         type: 'string'
-                    }
-                ]
-            },
-            sort: {},
-            slice: {
-                page: this.paginator.pageIndex + 1,
-                size: 25
-            },
-            search: {}
+                    },
+                        {
+                            value: this.dateForm.value.end,
+                            operator: 'lte',
+                            type: 'string'
+                        }
+                    ]
+                },
+                sort: {},
+                slice: {
+                    page: this.paginator.pageIndex + 1,
+                    size: 25
+                },
+                search: {}
+            }
+            this.itemService.paginate(filterConfig).pipe(
+                map((res)=>{
+                    this.isLoadingResults = false
+                    this.data = res.data
+                    console.log(this.data)
+                })
+            ).subscribe()
         }
-        this.itemService.paginate(filterConfig).pipe(
-            map((res)=>{
-                this.isLoadingResults = false
-                this.data = res.data
-                console.log(this.data)
-            })
-        ).subscribe()
+        this.invoiceListComponent.getSummary()
     }
     ngAfterViewInit() {
         this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
@@ -317,6 +544,41 @@ export class RevenusComponent implements AfterViewInit{
             )
             .subscribe(data => (this.data = data));
     }
+  loadInitialData() {
+    this.isLoadingResults = true;
+    const config = {
+      search: {},
+      filter: {},
+      sort: {
+        pointer: this.sort.active,
+        direction: this.sort.direction
+      },
+      slice: {
+        page: this.paginator.pageIndex + 1,
+        size: 25
+      },
+    };
+
+    this.itemService.paginate(config)
+      .pipe(
+        catchError(() => observableOf(null)),
+        map(data => {
+          this.isLoadingResults = false;
+          this.isRateLimitReached = data === null;
+
+          if (data === null) {
+            return [];
+          }
+          this.resultsLength = data.summary.filteredCount;
+          this.size = data.summary.size;
+          return data.data;
+        })
+      )
+      .subscribe(data => {
+        this.data = data; // Mettez à jour la source de données de la table
+      });
+  }
 
     protected readonly frames = frames;
+    protected readonly async = async;
 }

@@ -81,6 +81,7 @@ export const appRoutes: Route[] = [
             {path: 'invoiceDetail/:id', loadChildren: () => import('app/modules/admin/revenus/revenus/invoice-add/invoice-detail/invoice-detail.routes')},
             {path: 'invoiceList', loadChildren: () => import('app/modules/admin/revenus/revenus/invoice-list/invoice-list.routes')},
             {path: 'invoiceSearch', loadChildren: () => import('app/modules/admin/revenus/search/income-search/income-search.routes')},
+            {path: 'facturation', loadChildren: () => import('app/modules/admin/revenus/revenus/facturation-revenus/facturation-revenus.routes')},
         ]
     },
 ];

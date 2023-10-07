@@ -1,87 +1,100 @@
 <div class="flex flex-col flex-auto min-w-0">
-
-    <!-- Main -->
     <div class="flex-auto p-6 sm:p-10">
+        <div class="h-400  min-h-400 max-h-400 ">
+            <form [formGroup]="dateForm" (ngSubmit)="submit()">
+                <div class="grid grid-cols-6 gap-2">
+                    <mat-form-field>
+                        <input matInput [matDatepicker]="start" formControlName="start">
+                        <mat-datepicker-toggle matIconSuffix [for]="start"></mat-datepicker-toggle>
+                        <mat-datepicker #start></mat-datepicker>
+                    </mat-form-field>
 
-        <!-- CONTENT GOES HERE -->
-        <div class="h-400  min-h-400 max-h-400 bg-card">
+                    <mat-form-field>
+                        <input matInput [matDatepicker]="end" formControlName="end">
+                        <mat-datepicker-toggle matIconSuffix [for]="end"></mat-datepicker-toggle>
+                        <mat-datepicker #end></mat-datepicker>
+                    </mat-form-field>
 
-            <form [formGroup]="dateForm" (submit)="submit()">
-                <div class="row mrg-btm-15 border-radius-4 border-white border-danger">
-                    <div class="input-group">
-                        <div class="flex justify-start ...">
-                            <div>
-                                <mat-form-field color="accent" class="mr-5 w-90">
-                                    <input matInput [matDatepicker]="picker1" class="form-control input-sm bg-white" formControlName="start">
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker1 color="primary"></mat-datepicker>
-                                </mat-form-field>
-                            </div>
-                            <div>
-                                <mat-form-field color="accent" class="mr-10 w-90">
-                                    <input matInput [matDatepicker]="picker2" class="form-control input-sm bg-white w-48 mr-15" formControlName="end">
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker2 color="primary"></mat-datepicker>
-                                </mat-form-field>
-                            </div>
-                            <div>
-                                <button class="mat-elevation-z0 mr-1 " mat-mini-fab color="primary" type="submit" aria-label="Example icon button with a filter list icon">
-                                    <mat-icon>search</mat-icon>
-                                </button>
-                            </div>
-                            <div>
-                                <button class="mat-elevation-z0 mr-1 " mat-mini-fab color="primary" aria-label="Example icon button with a filter list icon" (click)="resetForm()">
-                                    <mat-icon>refresh</mat-icon>
-                                </button>
-                            </div>
+                    <div>
+                        <button type="submit"
+                                class="mat-elevation-z0 mt-1.5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                mat-mini-fab color="primary">
+                            <mat-icon>search</mat-icon>
+                        </button>
+                        <button mat-mini-fab class=" mt-1.5 text-white font-bold py-2 rounded" (click)="resetForm()">
+                            <mat-icon>refresh</mat-icon>
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+
+            <!--<hr class="-mt-1">-->
+            <div class="grid grid-cols-1 h-20 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full -mt-2">
+                <div
+                    class="sm:col-span-2 text-center lg:col-span-1 flex flex-col flex-auto bg-violet-100 shadow overflow-hidden">
+                    <div class="flex justify-center items-start -mt-0.5 m-6 mb-0">
+                        <div
+                            class="text-3xl text-primary tracking-tighter leading-tight">
+                            {{((summary2?.RevenueSummary?.total + summary2['InvoicePaymentSummary']?.total).toLocaleString('fr-FR') || 0)}}&nbsp;&nbsp;
+                            MGA
+                        </div>
+
+                    </div>
+                    <div class="flex flex-col justify-center lg:flex-row lg:items-center mx-6 mt-3">
+                        <div class="text-lg text-primary font-medium tracking-tight leading-6 truncate">
+                            Totale paiements
                         </div>
                     </div>
                 </div>
-            </form>
-            <hr class="-mt-1">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-8">
-            <div class="sm:col-span-2 lg:col-span-1 flex flex-col flex-auto bg-sky-200 shadow rounded-2xl overflow-hidden">
-                <div class="flex items-start justify-between m-6 mb-0">
-                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Totale paiements:</div>
+                <!-- Impressions -->
+                <div class="flex flex-col flex-auto bg-violet-100 shadow overflow-hidden">
+                    <div class="flex items-start justify-center -mt-0.5 m-6 mb-0">
+                        <div
+                            class="text-3xl text-primary tracking-tighter leading-tight">
+                            {{summary2.InvoiceSummary?.total?.toLocaleString('fr-FR')}}&nbsp;&nbsp;
+                            MGA
+                        </div>
+
+                    </div>
+                    <div class="flex flex-col justify-center lg:flex-row lg:items-center mx-6 mt-3">
+                        <div class="text-lg text-primary font-medium tracking-tight leading-6 truncate">Totale
+                            factures
+                        </div>
+                    </div>
                 </div>
-                <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
-                    <div class="text-5xl ml-15 tracking-tighter leading-tight">{{summary2.InvoicePaymentSummary?.total?.toLocaleString('fr-FR')}}&nbsp;&nbsp; MGA</div>
+                <!-- Visits -->
+                <div class="flex flex-col flex-auto bg-violet-100 shadow overflow-hidden">
+                    <div class="flex items-start justify-center -mt-0.5 m-6 mb-0">
+                        <div
+                            class="text-3xl text-primary  tracking-tighter leading-tight">{{summary2.InvoiceSummary?.balance?.toLocaleString('fr-FR')}}&nbsp;&nbsp;
+                            MGA
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-center lg:flex-row lg:items-center mx-6 mt-3">
+                        <div class="text-lg text-primary font-medium tracking-tight leading-6 truncate">Montant factures
+                            impayés
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <!-- Impressions -->
-            <div class="flex flex-col flex-auto bg-sky-200 shadow rounded-2xl overflow-hidden">
-                <div class="flex items-start justify-between m-6 mb-0">
-                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Totale factures:</div>
-                </div>
-                <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
-                    <div class="text-5xl ml-15 tracking-tighter leading-tight">{{summary2.InvoiceSummary?.total?.toLocaleString('fr-FR')}}&nbsp;&nbsp; MGA </div>
-                </div>
-            </div>
-            <!-- Visits -->
-            <div class="flex flex-col flex-auto bg-sky-200 shadow rounded-2xl overflow-hidden">
-                <div class="flex items-start justify-between m-6 mb-0">
-                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Montant factures impayés:</div>
-                </div>
-                <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
-                    <div class="text-5xl ml-15 tracking-tighter leading-tight">{{summary2.InvoiceSummary?.balance?.toLocaleString('fr-FR')}}&nbsp;&nbsp; MGA</div>
-                </div>
-            </div>
             </div>
             <hr>
 
-            <mat-tab-group>
-                <mat-tab label="PAIEMENTS">
-                    <div class="mt-8">
+            <mat-tab-group class="-mt-5" (selectedIndexChange)="onTabChange($event)">
+                <mat-tab label="PAIEMENTS ({{(+summary2.RevenueSummary?.count) + (+summary2.InvoicePaymentSummary?.count)}})"  [ngClass]="{'active-tab': activeTabIndex === 0}">
+                    <div class="-mt-2">
                         <div class="example-container mat-elevation-z8">
                             <div class="example-table-container">
-                                <button class="btn btn-sm btn-info mr-0 pull-right" (click)="settingsDrawer4.toggle()">
+                                <button
+                                    class="bg-blue-500 hover:bg-blue-700 pull-right text-white font-bold py-2 px-4 rounded"
+                                    (click)="settingsDrawer4.toggle()">
                                     Ajouter revenus
                                 </button>
                                 <table mat-table [dataSource]="data" class="example-table"
                                        matSort matSortActive="created_at" matSortDisableClear matSortDirection="desc">
                                     <!-- Number Column -->
                                     <ng-container matColumnDef="payé le">
-                                        <th mat-header-cell *matHeaderCellDef> Payé le </th>
+                                        <th mat-header-cell *matHeaderCellDef> Payé le</th>
                                         <td mat-cell *matCellDef="let row">
                                             {{ row.paid_at | date }}
                                             <span class="text-opacity-6 block text-xs">ID: {{row.id}}</span>
@@ -89,33 +102,36 @@
                                     </ng-container>
 
                                     <ng-container matColumnDef="contact">
-                                        <th mat-header-cell *matHeaderCellDef> Contact </th>
+                                        <th mat-header-cell *matHeaderCellDef> Contact</th>
                                         <td mat-cell *matCellDef="let row">
-                                            <a href [routerLink]="['/invoiceDetail', row.id]" *ngIf="row.id">{{ row.contact_name }}</a>
-                                            <span *ngIf="row?.type === 'INVOICE_PAYMENT'" class="text-opacity-6 block text-xs">
-                                                <i class="fa fa-file-archive-o text-primary mr-1" aria-hidden="true"></i> Facture n°
+                                            <a href [routerLink]="['/invoiceDetail', row.id]"
+                                               *ngIf="row.id">{{ row.contact_name }}</a>
+                                            <span *ngIf="row?.type === 'INVOICE_PAYMENT'"
+                                                  class="text-opacity-6 block text-xs">
+                                                <i class="fa fa-file-archive-o text-primary mr-1"
+                                                   aria-hidden="true"></i> Facture n°
                                                 {{row.invoice_id}}
                                     </span>
                                         </td>
                                     </ng-container>
 
                                     <ng-container matColumnDef="catégorie">
-                                        <th mat-header-cell *matHeaderCellDef> Catégorie </th>
+                                        <th mat-header-cell *matHeaderCellDef> Catégorie</th>
                                         <td mat-cell *matCellDef="let row">{{ row.Category.name }}</td>
                                     </ng-container>
 
                                     <ng-container matColumnDef="description">
-                                        <th mat-header-cell *matHeaderCellDef> Description </th>
+                                        <th mat-header-cell *matHeaderCellDef> Description</th>
                                         <td mat-cell *matCellDef="let row">{{ row.description }}</td>
                                     </ng-container>
 
                                     <ng-container matColumnDef="compte">
-                                        <th mat-header-cell *matHeaderCellDef> Compte </th>
+                                        <th mat-header-cell *matHeaderCellDef> Compte</th>
                                         <td mat-cell *matCellDef="let row">{{ row.Account.name }}</td>
                                     </ng-container>
 
                                     <ng-container matColumnDef="montant">
-                                        <th mat-header-cell *matHeaderCellDef> Montant </th>
+                                        <th mat-header-cell *matHeaderCellDef> Montant</th>
                                         <td mat-cell *matCellDef="let row">
                                             {{ row.amount.toLocaleString('fr-FR')}}&nbsp;MGA
                                             <span class="text-opacity-6 block text-xs">
@@ -125,7 +141,8 @@
                                     </ng-container>
 
                                     <ng-container matColumnDef="créer le">
-                                        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear> Créé par </th>
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear> Créé par
+                                        </th>
                                         <td mat-cell *matCellDef="let row">
                                             {{ row.User.name}}
                                             <span class="text-opacity-6 block text-xs">
@@ -133,18 +150,106 @@
                                     </span>
                                         </td>
                                     </ng-container>
+                                    <ng-container matColumnDef="columnOne">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                    </ng-container>
+                                    <ng-container matColumnDef="searchContact">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            <form class="example-form">
+                                                <mat-form-field class="example-full-width w-full mt-3">
+                                                    <input type="text"
+                                                           placeholder="Contact..."
+                                                           matInput
+                                                           [matAutocomplete]="auto"
+                                                           [(ngModel)]="searchTerm"
+                                                           name="searchTerm"
+                                                           (ngModelChange)="this.inputDebounceSearch.next($event)"
+                                                    >
+                                                    <!--<input type="reset" (click)="reste()" class="font-medium" value="X">-->
+                                                    <mat-autocomplete #auto="matAutocomplete"
+                                                                      (optionSelected)="onOptionSelected($event)">
+                                                        <mat-option *ngFor="let option of filteredOptions | async"
+                                                                    [value]="option.name" [id]="option.id">
+                                                            {{option.name}}
+                                                        </mat-option>
+                                                    </mat-autocomplete>
+                                                </mat-form-field>
+                                            </form>
+                                        </th>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="searchCategory">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            <form class="example-form">
+                                                <mat-select
+                                                    #inputSearchCategory
+                                                    placeholder="Sélectionnez une catégorie"
+                                                    [formControl]="searchCategoryControl"
+                                                    (selectionChange)="onSelectionCategoryChange($event.value)"
+                                                >
+                                                    <mat-option *ngFor="let item of categories" [value]="item"
+                                                                id="{{item.id}}">
+                                                        {{ item.name }}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </form>
+                                        </th>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="searchDescription">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            <form class="example-form">
+                                                <mat-form-field class="example-full-width w-full mt-3">
+                                                    <input placeholder="Recherche..." matInput
+                                                           [(ngModel)]="searchDescription"
+                                                           type="text" name="userQuestion" id="userQuestions"
+                                                           (ngModelChange)="this.searchDescriptionUpdate.next($event)"
+                                                    >
+                                                </mat-form-field>
+                                            </form>
+                                        </th>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="columnFive">
+                                        <!--empty column 1 -->
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="searchAmount">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            <form class="example-form">
+                                                <mat-form-field class="example-full-width w-full mt-3">
+                                                    <mat-select
+                                                        #inputSearchAmount
+                                                        placeholder="Mode de payment"
+                                                        [formControl]="searchAmountControl"
+                                                        (selectionChange)="onSelectPaymentMethod($event.value)"
+                                                    >
+                                                        <mat-option *ngFor="let item of paymentMethods" [value]="item">
+                                                            {{ item.name }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </form>
+                                        </th>
+                                    </ng-container>
+                                    <ng-container matColumnDef="columnSeven">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                    </ng-container>
 
                                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                    <tr mat-header-row *matHeaderRowDef="searchDisplayColumns"></tr>
                                     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
                                 </table>
                             </div>
 
-                            <mat-paginator [length]="resultsLength" [pageSize]="size" aria-label="Select page of GitHub search results"></mat-paginator>
+                            <mat-paginator [length]="resultsLength" [pageSize]="size"
+                                           aria-label="Select page of GitHub search results"></mat-paginator>
                         </div>
                     </div>
                 </mat-tab>
-                <mat-tab label="FACTURES">
-                    <app-invoice-list></app-invoice-list>
+                <mat-tab label="FACTURES ({{summary2?.InvoiceSummary?.count}})" [ngClass]="{'active-tab': activeTabIndex === 1}">
+                    <app-invoice-list class="-mt-10" #invoiceListComponent [dateForm]="dateForm"></app-invoice-list>
                 </mat-tab>
             </mat-tab-group>
         </div>
@@ -190,7 +295,8 @@
                                     [ngClass]="formFieldHelpers"
                                     class="flex-auto gt-xs:pl-3">
                         <mat-label>Catégorie</mat-label>
-                        <mat-select formControlName="category_id" [ngClass]="{'error': submitted && addRevenueForm.controls.account_id.invalid}">
+                        <mat-select formControlName="category_id"
+                                    [ngClass]="{'error': submitted && addRevenueForm.controls.account_id.invalid}">
                             <mat-option *ngFor="let item of categories" [value]="item.id">
                                 {{ item.id }} - {{ item.name }}
                             </mat-option>
@@ -202,7 +308,8 @@
                                     [ngClass]="formFieldHelpers"
                                     class="flex-auto gt-xs:pl-3">
                         <mat-label>Compte</mat-label>
-                        <mat-select formControlName="account_id" [ngClass]="{'error': submitted && addRevenueForm.controls.account_id.invalid}">
+                        <mat-select formControlName="account_id"
+                                    [ngClass]="{'error': submitted && addRevenueForm.controls.account_id.invalid}">
                             <mat-option *ngFor="let item of accounts" [value]="item.id">
                                 {{ item.id }} - {{ item.name }}
                             </mat-option>
@@ -211,9 +318,10 @@
                 </div>
                 <div class="flex">
                     <div appearance="fill"
-                                    [ngClass]="formFieldHelpers"
-                                    class="flex-auto gt-xs:pl-3">
-                        <mat-label>Contact</mat-label> <br>
+                         [ngClass]="formFieldHelpers"
+                         class="flex-auto gt-xs:pl-3">
+                        <mat-label>Contact</mat-label>
+                        <br>
                         <app-typehead-contact formControlName="contact" [submitted]="submitted"></app-typehead-contact>
                     </div>
                 </div>
@@ -232,7 +340,8 @@
                                     [ngClass]="formFieldHelpers"
                                     class="flex-auto gt-xs:pl-3">
                         <mat-label>Mode de Payment</mat-label>
-                        <mat-select formControlName="payment_method" [ngClass]="{'error': submitted && addRevenueForm.controls.account_id.invalid}">
+                        <mat-select formControlName="payment_method"
+                                    [ngClass]="{'error': submitted && addRevenueForm.controls.account_id.invalid}">
                             <mat-option *ngFor="let item of appService.paymentMethods" [value]="item.code">
                                 {{ item.name }}
                             </mat-option>
@@ -244,12 +353,13 @@
                         [ngClass]="formFieldHelpers"
                         class="fuse-mat-textarea flex-auto">
                         <mat-label>Description</mat-label>
-                        <textarea matInput formControlName = "description"></textarea>
+                        <textarea matInput formControlName="description"></textarea>
                     </mat-form-field>
                 </div>
                 <button type="submit" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
                 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600
-                dark:hover:bg-green-700 dark:focus:ring-green-800" (click)="settingsDrawer4.close()">Ajouter</button>
+                dark:hover:bg-green-700 dark:focus:ring-green-800" (click)="settingsDrawer4.close()">Ajouter
+                </button>
 
             </form>
         </div>

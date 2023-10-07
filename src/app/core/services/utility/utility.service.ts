@@ -36,43 +36,43 @@ export class UtilityService {
         switch (status) {
             case 'REJECTED':
             case 'CANCELED':
-                style.background = 'default';
+                style.background = 'red';
                 style.color = 'dark';
                 style.valuenow = 0;
                 style.width = '0%';
                 break;
             case 'VOIDED':
-                style.background = 'default';
+                style.background = 'red';
                 style.color = 'dark';
                 style.valuenow = 0;
                 style.width = '0%';
                 break;
             case 'REFUNDED':
-                style.background = 'default';
+                style.background = 'red';
                 style.color = 'dark';
                 style.valuenow = 0;
                 style.width = '0%';
                 break;
             case 'OPEN':
-                style.background = 'primary';
+                style.background = 'green';
                 style.color = 'white';
                 style.valuenow = 10;
                 style.width = '10%';
                 break;
             case 'SENT':
-                style.background = 'danger';
+                style.background = 'red';
                 style.color = 'white';
                 style.valuenow = 20;
                 style.width = '20%';
                 break;
             case 'APPROVED':
-                style.background = 'danger';
+                style.background = 'red';
                 style.color = 'white';
                 style.valuenow = 25;
                 style.width = '25%';
                 break;
             case 'IN_PROGRESS':
-                style.background = 'info';
+                style.background = 'Light blue';
                 style.color = 'white';
                 style.valuenow = 50;
                 style.width = '50%';
@@ -84,25 +84,25 @@ export class UtilityService {
                 style.width = '75%';
                 break;
             case 'PARTIAL':
-                style.background = 'warning';
+                style.background = 'Yellow';
                 style.color = 'dark';
                 style.valuenow = 50;
                 style.width = '50%';
                 break;
             case 'PAID':
-                style.background = 'success';
+                style.background = 'green';
                 style.color = 'white';
                 style.valuenow = 100;
                 style.width = '100%';
                 break;
             case 'COMPLETED':
-                style.background = 'success';
+                style.background = 'green';
                 style.color = 'white';
                 style.valuenow = 100;
                 style.width = '100%';
                 break;
             default:  //  DRAFT
-                style.background = 'danger';
+                style.background = 'red';
                 style.color = 'white';
                 style.valuenow = 100;
                 style.width = '100%';

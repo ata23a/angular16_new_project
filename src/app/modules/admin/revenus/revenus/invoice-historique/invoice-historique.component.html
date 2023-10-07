@@ -26,16 +26,21 @@
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
     </mat-table>
-    <table>
-        <tr>
-            <td colspan="3">
-                <input type="text" class="border h-10 border-gray-300 rounded-sm p-0" formControlName="description"
-                       placeholder="Entrer description ..."
-                       [class.error]="submitted && form.controls.description.invalid">
-            </td>
-            <td>
-                <button class="bg-green-500 h-10 text-white px-2 py-1 text-sm w-full" appXhrBtnIndicator translate>Ajouter</button>
-            </td>
-        </tr>
-    </table>
+
+    <div class="flex items-center">
+        <label for="voice-search" class="sr-only">Search</label>
+        <div class="relative w-full">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <mat-icon>keyboard</mat-icon>
+            </div>
+            <input type="text" formControlName="description" id="voice-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-1xl focus:ring-green-500
+            focus:border-green-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
+            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Entrer description ..." required>
+
+        </div>
+        <button class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium bg-green-500 text-white border hover:bg-green-800 focus:ring-4
+        focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" appXhrBtnIndicator>
+            Ajouter
+        </button>
+    </div>
 </form>

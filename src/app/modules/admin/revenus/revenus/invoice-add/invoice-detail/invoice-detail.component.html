@@ -1,58 +1,57 @@
 <div class="flex flex-col flex-auto min-w-0">
     <div class="flex-auto p-6 sm:p-10">
-        <div class="h-400 min-h-400 max-h-400 bg-card">
-            <button mat-button class="bg-primary text-white rounded-lg"
-                    [ngClass]="'bg-' + utilityService.statusStyle(invoice?.status).background + '-inverse'">
-                {{invoice?.status}}
-            </button>
-            <hr>
+        <div class="h-400 min-h-400 max-h-400 bg-card relative">
+            <div class="status mt-1">
+                <button mat-button class="text-white rounded-lg"
+                        [ngClass]="'bg-' + utilityService.statusStyle(invoice?.status).background + '-500'">
+                    {{invoice?.status}}
+                </button>
+            </div>
             <mat-tab-group class="sm:px-2" [animationDuration]="'0'">
                 <mat-tab label="FACTURE">
                     <form role="form" [formGroup]="invoiceForm" autocomplete="off" novalidate>
-                        <div class="padding-30 card-item">
-                            <div class="row">
-                                <label class="col-lg-2 col-form-label text-lg-right">Client</label>
 
-                                <div class="col-lg-3">
-                                    <div class="form-group">
-                                        <app-typehead-contact *ngIf="invoiceForm" formControlName="contact"
-                                                              [submitted]="submitted">
-                                        </app-typehead-contact>
-                                    </div>
+                        <div class=" grid grid-rows-4 gap--2 grid-cols-2 ">
+                            <div class="grid grid-cols-3 items-center">
+                                <label class="text-right mr-4 font-normal text-gray-500">Client:</label>
+                                <div class="col-start-2 col-span-2">
+                                    <app-typehead-contact *ngIf="invoiceForm" formControlName="contact"
+                                                          [submitted]="submitted">
+                                    </app-typehead-contact>
                                 </div>
-
-                                <label class="offset-lg-1 col-lg-3 col-form-label text-lg-right">ID / N° Requête</label>
-
-                                <label class="col-lg-3 col-form-label">
-                                    {{invoice?.id}} / {{invoice?.request_id}}
-                                </label>
+                            </div>
+                            <div class="grid grid-cols-3 items-center">
+                                <label class="text-right mr-4 font-normal text-gray-500">ID / N° Requête:</label>
+                                <div class="col-start-2 border-1 col-span-2 rounded-lg h-10">
+                                    <span class="ml-2">{{invoice?.id}} / {{invoice?.request_id}}</span>
+                                </div>
                             </div>
 
-                            <div class="row">
-                                <label class="col col-form-label text-lg-right">Tél.</label>
-
-                                <label class="col-lg-3 col-form-label text-dark">
-                                    {{invoice?.Contact?.phone }}</label>
-
-                                <label class="offset-lg-1 col-lg-3 col-form-label text-lg-right">Groupe</label>
-
-                                <label class="col-lg-3 col-form-label">
-                                    <a href class="text-dark" *ngIf="invoice && invoice.invoice_group_id"
+                            <div class="grid grid-cols-3 items-center">
+                                <label class="text-right mr-4 font-normal text-gray-500">Tel.:</label>
+                                <div class="col-start-2 border-1 col-span-2 rounded-lg h-10">
+                                    <span class="ml-2">{{invoice?.Contact?.phone }}</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 items-center">
+                                <label class="text-right mr-4 font-normal text-gray-500">Groupe:</label>
+                                <div class="col-start-2 border-1 col-span-2 rounded-lg h-10">
+                                    <a href class="text-dark ml-2" *ngIf="invoice && invoice.invoice_group_id"
                                        [routerLink]="['/cashDesk/group/detail/', invoice?.invoice_group_id]">
                                         {{invoice?.InvoiceGroup?.contact_name}} / {{invoice?.invoice_group_id}}
                                     </a>
-                                </label>
+                                </div>
                             </div>
 
-                            <div class="row">
-                                <label class="col col-form-label text-lg-right">Email</label>
-
-                                <label class="col-lg-3 col-form-label text-dark">
-                                    {{invoice?.Contact?.email}}</label>
-
-                                <label class="offset-lg-1 col-lg-3 col-form-label text-lg-right">Facturé le</label>
-
-                                <div class="col-lg-3">
+                            <div class="grid grid-cols-3 items-center">
+                                <label class="text-right mr-4 font-normal text-gray-500">Email:</label>
+                                <div class="col-start-2 border-1 col-span-2 rounded-lg h-10">
+                                    {{invoice?.Contact?.email}}
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 items-center">
+                                <label class="text-right mr-4 font-normal text-gray-500">Facturé le:</label>
+                                <div class="col-start-2 col-span-2">
                                     <mat-form-field class="w-90" appearance="fill">
                                         <input matInput [matDatepicker]="picker1" formControlName="invoiced_at"
                                                placeholder="Choisissez une date">
@@ -63,49 +62,42 @@
                                          class="text-danger">
                                         Date est requise.
                                     </div>
-                                    <!--<input type="date" class="form-control" formControlName="invoiced_at" >-->
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <label class="col col-form-label text-lg-right">Catégorie</label>
-
-                                <div class="col-lg-3">
-                                    <div class="form-group">
-                                        <mat-form-field class="w-90" appearance="fill">
-                                            <mat-select class="w-90" formControlName="category_id">
-                                                <mat-option class="w-90" *ngFor="let category of categories | async"
-                                                            [value]="category.id">
-                                                    {{ category.name }}
-                                                </mat-option>
-                                            </mat-select>
-                                        </mat-form-field>
-                                        <div *ngIf="submitted && invoiceForm.get('category_id').invalid"
-                                             class="text-danger">
-                                            Catégorie est requise.
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <label class="offset-lg-1 col-lg-3 col-form-label text-lg-right">Date d'échéance /
-                                    voyage</label>
-
-                                <div class="col-lg-3">
-                                    <div class="form-group">
-                                        <mat-form-field class="w-90" appearance="fill">
-                                            <input matInput [matDatepicker]="picker2" formControlName="due_at"
-                                                   placeholder="Choisissez une date">
-                                            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-                                            <mat-datepicker #picker2></mat-datepicker>
-                                        </mat-form-field>
-                                        <div *ngIf="submitted && invoiceForm.get('due_at').invalid" class="text-danger">
-                                            Date est requise.
-                                        </div>
-                                        <!--<input type="date" class="form-control" formControlName="due_at" >-->
+                            <div class="grid grid-cols-3 items-center">
+                                <label class="text-right mr-4 font-normal text-gray-500">Catégorie:</label>
+                                <div class="col-start-2 col-span-2">
+                                    <mat-form-field class="w-90" appearance="fill">
+                                        <mat-select class="w-90" formControlName="category_id">
+                                            <mat-option class="w-90" *ngFor="let category of categories | async"
+                                                        [value]="category.id">
+                                                {{ category.name }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <div *ngIf="submitted && invoiceForm.get('category_id').invalid"
+                                         class="text-danger">
+                                        Catégorie est requise.
                                     </div>
                                 </div>
                             </div>
-
+                            <div class="grid grid-cols-3 items-center">
+                                <label class="text-right mr-4 font-normal text-gray-500">Date d'échéance / voyage</label>
+                                <div class="col-start-2 col-span-2">
+                                    <mat-form-field class="w-90" appearance="fill">
+                                        <input matInput [matDatepicker]="picker2" formControlName="due_at"
+                                               placeholder="Choisissez une date">
+                                        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                                        <mat-datepicker #picker2></mat-datepicker>
+                                    </mat-form-field>
+                                    <div *ngIf="submitted && invoiceForm.get('due_at').invalid" class="text-danger">
+                                        Date est requise.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="padding-30 card-item">
                             <div class="text-right">
                             </div>
 
@@ -253,14 +245,14 @@
                             <div class="col">
                                 <button type="button" class="btn btn-dark mb-0" (click)="print('A4')"
                                         [disabled]="invoice?.status === 'VOIDED'">
-                                    <mat-icon svgIcon="heroicons_outline:printer"></mat-icon>
+                                    <mat-icon svgIcon="heroicons_outline:printer" class="text-white"></mat-icon>
                                 </button>
                                 <button mat-button [matMenuTriggerFor]="menu">
                                     <span class="mrg-right-10">Autres actions</span>
                                     <mat-icon>arrow_drop_down</mat-icon>
                                 </button>
                                 <mat-menu #menu="matMenu">
-                                    <button mat-menu-item (click)="settingsDrawer2.toggle(); openSidePanelPayment()">Ajouter un payment</button>
+                                    <button mat-menu-item (click)=" openSidePanelPayment()">Ajouter un payment</button>
                                     <button mat-menu-item (click)="print('A4V2')">A4 Version 2</button>
                                     <button mat-menu-item (click)="print('RECEIPT')">Ticket caisse</button>
                                     <button mat-menu-item (click)="duplicate()">Dupliquer</button>
@@ -272,7 +264,7 @@
                     </form>
                 </mat-tab>
                 <mat-tab label="PAIEMENT">
-                    <list-payment [facture]="invoice" [dataTable]="revenus"></list-payment>
+                    <list-payment #payment [facture]="invoice" [dataTable]="revenus"></list-payment>
                 </mat-tab>
                 <mat-tab label="HISORIQUE">
                     <invoice-historique [dataTable]="histories"
@@ -289,10 +281,11 @@
 <fuse-drawer
     class="w-screen min-w-screen sm:w-100 sm:min-w-100 z-999"
     fixed
+    #drawer
     [mode]="'over'"
     [name]="'settingsDrawer2'"
     [position]="'right'"
-    #settingsDrawer2>
+    >
 
     <div class="flex flex-col w-full overflow-auto bg-card">
         <div class="flex flex-row items-center px-6 h-20 min-h-20 text-white bg-primary">
@@ -302,7 +295,7 @@
             <button
                 class="ml-auto"
                 mat-icon-button
-                (click)="settingsDrawer2.close()">
+                (click)="close()">
                 <mat-icon
                     class="text-current"
                     [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
@@ -362,7 +355,7 @@
                 </div>
                 <button type="submit" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
                 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600
-                dark:hover:bg-green-700 dark:focus:ring-green-800" (click)="settingsDrawer2.close()">Ajouter</button>
+                dark:hover:bg-green-700 dark:focus:ring-green-800" >Ajouter</button>
             </form>
         </div>
     </div>
