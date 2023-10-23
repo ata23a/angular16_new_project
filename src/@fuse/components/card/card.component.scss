@@ -2,7 +2,7 @@ fuse-card {
     position: relative;
     display: flex;
     overflow: hidden;
-    @apply rounded-2xl shadow bg-card;
+    @apply rounded-0xl shadow bg-card;
 
     /* Flippable */
     &.fuse-card-flippable {
@@ -37,7 +37,7 @@ fuse-card {
             z-index: 10;
             transition: transform 0.5s ease-out 0s, visibility 0s ease-in 0.2s, opacity 0s ease-in 0.2s;
             backface-visibility: hidden;
-            @apply rounded-2xl shadow bg-card;
+            @apply rounded-0xl shadow bg-card;
         }
 
         .fuse-card-front {

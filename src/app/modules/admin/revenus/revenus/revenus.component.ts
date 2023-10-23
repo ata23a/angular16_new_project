@@ -56,6 +56,8 @@ import {AccountService} from "../../../../core/services/account/account.service"
 import {AppService} from "../../../../core/services/app/app.service";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {ContactService} from "../../../../core/services/contact/contact.service";
+import {TranslocoModule} from "@ngneat/transloco";
+import {MdbTabsModule} from "mdb-angular-ui-kit/tabs";
 
 @Component({
   selector: 'app-revenus',
@@ -88,7 +90,9 @@ import {ContactService} from "../../../../core/services/contact/contact.service"
         NgClass,
         MatAutocompleteModule,
         FormsModule,
-        AsyncPipe
+        AsyncPipe,
+        TranslocoModule,
+        MdbTabsModule
     ]
 })
 export class RevenusComponent implements AfterViewInit{
@@ -166,10 +170,6 @@ export class RevenusComponent implements AfterViewInit{
         this.paymentMethods = this.appService.paymentMethods;
     }
 
-    onTabChange(event: any) {
-        console.log(event)
-        this.activeTabIndex = event;
-    }
     onSelectPaymentMethod(event: any) {
         console.log(event)
         this.isLoadingResults = true
@@ -532,11 +532,11 @@ export class RevenusComponent implements AfterViewInit{
                 }),
                 map(data => {
                     this.isLoadingResults = false;
-                    this.isRateLimitReached = data === null;
+                    //this.isRateLimitReached = data === null;
 
-                    if (data === null) {
+                    /*if (data === null) {
                         return [];
-                    }
+                    }*/
                     this.resultsLength = data.summary.filteredCount;
                     this.size = data.summary.size
                     return data.data;

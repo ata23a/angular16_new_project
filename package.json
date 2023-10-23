@@ -43,6 +43,7 @@
     "lodash.orderby": "^4.6.0",
     "lodash.sumby": "^4.6.0",
     "luxon": "3.3.0",
+    "mdb-angular-ui-kit": "^5.1.0",
     "moment": "^2.29.4",
     "ng-apexcharts": "1.7.6",
     "ngx-datatable": "^1.0.3",
