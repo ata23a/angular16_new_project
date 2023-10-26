@@ -13,11 +13,8 @@ export class JwtInterceptor implements HttpInterceptor {
     ) {}
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        console.log('Intercepteur JWT est appelé');
-        // add authorization header with jwt token if available
         const token = this.sessionService.getToken();
         if (token) {
-            console.log('Token récupéré dans l\'intercepteur JWT :', token);
             request = request.clone({
                 headers: request.headers.set('X-Access-Token', token)
             });

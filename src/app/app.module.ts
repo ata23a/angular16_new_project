@@ -4,7 +4,6 @@ import {MatPaginatorModule} from "@angular/material/paginator";
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {JwtInterceptor} from "./core/interceptor/jwt-interceptor";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
-import { TypeheadContactComponent } from './modules/admin/revnus/invoice-add/typehead-contact/typehead-contact.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NgbHighlight, NgbInputDatepicker, NgbTypeahead} from "@ng-bootstrap/ng-bootstrap";
 import {CommonModule, NgClass} from "@angular/common";
@@ -21,11 +20,14 @@ import {FuseDrawerComponent} from "../@fuse/components/drawer";
 import {MatDatepickerModule} from "@angular/material/datepicker";
 import {MatOptionModule} from "@angular/material/core";
 import {MatSelectModule} from "@angular/material/select";
+import {ImagesrcDirective} from "./core/shared/directives/imagesrc.directive";
+import { TypeHeadContactComponent } from './modules/admin/type-head-contact/type-head-contact.component';
 
 @NgModule({
   declarations: [
-    TypeheadContactComponent,
     SidePanelPaymentComponent,
+    ImagesrcDirective,
+    TypeHeadContactComponent,
   ],
     imports: [
         HttpClientModule,
@@ -53,7 +55,8 @@ import {MatSelectModule} from "@angular/material/select";
         MatSelectModule,
     ],
     exports: [
-        TypeheadContactComponent,
+        ImagesrcDirective,
+        TypeHeadContactComponent,
     ],
     providers: [
       MatSnackBarModule,

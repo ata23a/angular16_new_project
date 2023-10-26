@@ -10,7 +10,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
-import { UserService } from 'app/core/user/user.service';
+import {UserService} from "../../../core/services/user/user.service";
 
 @Component({
     selector     : 'auth-unlock-session',
@@ -32,6 +32,7 @@ export class AuthUnlockSessionComponent implements OnInit
     showAlert: boolean = false;
     unlockSessionForm: UntypedFormGroup;
     private _email: string;
+    session
 
     /**
      * Constructor
@@ -55,12 +56,12 @@ export class AuthUnlockSessionComponent implements OnInit
      */
     ngOnInit(): void
     {
+        this.session = JSON.parse(sessionStorage.getItem('session'));
+        const user = this.session ? this.session.user : {};
         // Get the user's name
-        this._userService.user$.subscribe((user) =>
-        {
+
             this.name = user.name;
             this._email = user.email;
-        });
 
         // Create the form
         this.unlockSessionForm = this._formBuilder.group({

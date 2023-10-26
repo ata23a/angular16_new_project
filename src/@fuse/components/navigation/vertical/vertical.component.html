@@ -1,9 +1,9 @@
-<div class="fuse-vertical-navigation-wrapper">
+<div class="fuse-vertical-navigation-wrapper bg-white text-black">
 
     <!-- Header -->
-    <div class="fuse-vertical-navigation-header">
+    <!--<div class="fuse-vertical-navigation-header">
         <ng-content select="[fuseVerticalNavigationHeader]"></ng-content>
-    </div>
+    </div>-->
 
     <!-- Content -->
     <div
@@ -33,7 +33,6 @@
                         [skipChildren]="true"
                         (click)="toggleAside(item)"></fuse-vertical-navigation-aside-item>
                 </ng-container>
-
                 <!-- Basic -->
                 <ng-container *ngIf="item.type === 'basic'">
                     <fuse-vertical-navigation-basic-item
@@ -74,6 +73,7 @@
             </ng-container>
 
         </ng-container>
+
 
         <!-- Content footer -->
         <div class="fuse-vertical-navigation-content-footer">

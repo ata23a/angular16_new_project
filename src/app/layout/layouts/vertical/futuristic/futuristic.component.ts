@@ -9,8 +9,6 @@ import { FuseNavigationService, FuseVerticalNavigationComponent } from '@fuse/co
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { Navigation } from 'app/core/navigation/navigation.types';
-import { UserService } from 'app/core/user/user.service';
-import { User } from 'app/core/user/user.types';
 import { LanguagesComponent } from 'app/layout/common/languages/languages.component';
 import { MessagesComponent } from 'app/layout/common/messages/messages.component';
 import { NotificationsComponent } from 'app/layout/common/notifications/notifications.component';
@@ -19,6 +17,8 @@ import { SearchComponent } from 'app/layout/common/search/search.component';
 import { ShortcutsComponent } from 'app/layout/common/shortcuts/shortcuts.component';
 import { UserComponent } from 'app/layout/common/user/user.component';
 import { Subject, takeUntil } from 'rxjs';
+import User from "../../../../core/model/user";
+import {UserService} from "../../../../core/services/user/user.service";
 
 @Component({
     selector     : 'futuristic-layout',
@@ -32,6 +32,7 @@ export class FuturisticLayoutComponent implements OnInit, OnDestroy
     isScreenSmall: boolean;
     navigation: Navigation;
     user: User;
+    session
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -78,12 +79,8 @@ export class FuturisticLayoutComponent implements OnInit, OnDestroy
             });
 
         // Subscribe to the user service
-        this._userService.user$
-            .pipe((takeUntil(this._unsubscribeAll)))
-            .subscribe((user: User) =>
-            {
-                this.user = user;
-            });
+        this.session = JSON.parse(sessionStorage.getItem('session'));
+        this.user = this.session ? this.session.user : {};
 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$

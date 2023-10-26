@@ -18,6 +18,7 @@ class User extends BaseModel {
   Geographies?: Geography[];
   Profile?: UserProfile;
   Roles?: Role[];
+  status: string
 }
 
 export class UserProfile extends BaseModel {

@@ -1,6 +1,7 @@
 import {NgIf} from '@angular/common';
 import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {
+    FormGroup,
     FormsModule,
     NgForm,
     ReactiveFormsModule,
@@ -21,6 +22,7 @@ import {AuthentificationService} from "../../../core/services/authentification/a
 import {AppService} from "../../../core/services/app/app.service";
 import Swal from "sweetalert2";
 import {FuseConfigService} from "../../../../@fuse/services/config";
+import {UtilityService} from "../../../core/services/utility/utility.service";
 
 @Component({
     selector: 'auth-sign-in',
@@ -53,12 +55,18 @@ export class AuthSignInComponent implements OnInit {
     api: string;
     display_id: string;
 
+    loginForm: FormGroup;
+
+    app_copyright: number;
+    app_version;
+    logoUrl: string;
     constructor(
         private _activatedRoute: ActivatedRoute,
         private authService: AuthentificationService,
         private _formBuilder: UntypedFormBuilder,
         private _router: Router,
         private _fuseConfigService: FuseConfigService,
+        private utilityService: UtilityService
     ) {
     }
 
@@ -73,8 +81,18 @@ export class AuthSignInComponent implements OnInit {
                 Validators.required
             ],
         });
+        this.setLogo()
+
     }
 
+    setLogo() {
+        this.logoUrl = this.utilityService.getImageUrl(AppService.APP_ID, 'LOGO');
+        const favIcon: HTMLLinkElement = document.querySelector('#appIcon');
+
+        if (favIcon) {
+            favIcon.href = this.logoUrl;
+        }
+    }
     signIn() {
         this.submitted = true;
 
@@ -170,7 +188,7 @@ export class AuthSignInComponent implements OnInit {
         this.api = null;
         this.submitted = false;
         this.signInForm.reset();
-        //this.setLogo();
+        this.setLogo();
     }
 
 

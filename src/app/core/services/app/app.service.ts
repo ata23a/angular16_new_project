@@ -10,8 +10,25 @@ export class AppService {
 
     constructor() {
     }
+    getMinDate = () => {
+        return {year: 1900, month: 1, day: 1};
+    }
+    marital_statuses = ['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOW', 'UNK'];
+
+    public static get APP_ID() {
+        const API = AppService.API;
+        if (!API) {
+            return null;
+        }
+
+        const split = API.split('/');
+        return split[split.length - 1];
+    };
 
     public static DEFAULT_CURRENCY = 'MGA';
+    public static DEFAULT_LOGO = 'assets/capsule/logo/logo_tokotaniko.png';
+    public static DEFAULT_IMAGE = 'assets/capsule/p0.jpg';
+
 
     public static set API(value: string) {
         localStorage.setItem('API', value);

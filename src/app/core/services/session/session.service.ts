@@ -22,6 +22,11 @@ export class SessionService {
         return null;
     };
 
+    getActiveMenu = () => {
+        const user = this.getUser();
+        return user ? user.activeMenu[user.activeRoleIndex || 0] : null;
+    }
+
     getToken = () => {
         return window.sessionStorage.getItem('token');
     };

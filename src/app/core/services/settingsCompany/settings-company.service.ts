@@ -2,6 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../environments/environment";
 import {AppService} from "../app/app.service";
+import {Observable} from "rxjs";
+import Company from "../../model/company";
 
 @Injectable({
     providedIn: 'root'
@@ -20,6 +22,10 @@ export class SettingsCompanyService {
         return session ? JSON.parse(session)[key] : null;
     }
 
+    list(isList?: boolean): Observable<Company[]> {
+        const url = isList ? [AppService.API, 'companies/list'].join('/') : [AppService.API, 'companies'].join('/');
+        return this.http.get<Company[]>(url);
+    }
     getSettings(id: number, fields?: any[]) {
         const url = [AppService.API, 'companies', id, 'settings'].join('/');
 

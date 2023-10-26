@@ -1,6 +1,6 @@
 <div class="flex flex-col flex-auto min-w-0">
     <div class="flex-auto p-6 sm:p-10">
-        <div class="h-400  min-h-400 max-h-400 ">
+        <div class="h-200  min-h-200 max-h-200 overflow-y-auto">
             <form [formGroup]="dateForm" (ngSubmit)="submit()">
                 <div class="grid grid-cols-6 gap-2">
                     <mat-form-field>
@@ -494,7 +494,7 @@
                          class="flex-auto gt-xs:pl-3">
                         <mat-label>Contact</mat-label>
                         <br>
-                        <app-typehead-contact formControlName="contact" [submitted]="submitted"></app-typehead-contact>
+                        <app-type-head-contact formControlName="contact" [submitted]="submitted"></app-type-head-contact>
                     </div>
                 </div>
                 <div class="flex">

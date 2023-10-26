@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {NgbDate} from "@ng-bootstrap/ng-bootstrap";
 import moment from "moment";
+import {AppService} from "../app/app.service";
 
 @Injectable({
     providedIn: 'root'
@@ -10,6 +11,33 @@ export class UtilityService {
 
     constructor() {
     }
+
+    getImageUrl = (docId: string, type: 'CONTACT' | 'LOGO' | 'USER' | 'STATIC', docType?: string) => {
+        let path = null;
+
+        if (type === 'CONTACT') path = `contacts/${docId}/photo`;
+        else if (type === 'USER') path = `users/${docId}/photo`;
+        else if (type === 'STATIC') path = `static/${docType}/${docId}`;
+        else path = `public/logo/${docId}`;
+
+        const fullPath = docId ? [AppService.API, path].join('/') : AppService.DEFAULT_LOGO;
+
+        return fullPath;
+    };
+    getUploadUrl = (id: any, type: 'CONTACT' | 'COMPANY' | 'USER' | 'ATTACHMENT', route?: string) => {
+        let path = null;
+
+        if (type === 'CONTACT') path = `contacts/${id}/photo`;
+        else if (type === 'COMPANY') path = `companies/${id}`;  //  logo or signature
+        else if (type === 'USER') path = `users/${id}/photo`;
+        else if (type === 'ATTACHMENT') path = `${route}/${id}/attachment`;
+        else path = null;
+
+        const fullPath = [AppService.API, path].join('/');
+        // console.log('[uploadUrl] ', fullPath);
+
+        return fullPath;
+    };
 
     ngbDateToMoment = (date: NgbDate) => {
         const cT = moment();

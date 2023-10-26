@@ -17,7 +17,7 @@
 
                         <div class="col-lg-3">
                             <div class="form-group">
-                                <app-typehead-contact formControlName="contact" [(phoneselected)]="phoneselected" [submitted]="submitted" required></app-typehead-contact>
+                                <app-type-head-contact formControlName="contact" [(phoneselected)]="phoneselected" [submitted]="submitted" required></app-type-head-contact>
                             </div>
                             <div *ngIf="submitted && addInvoiceForm.get('contact').invalid" class="text-danger">
                                 Client est requis.
