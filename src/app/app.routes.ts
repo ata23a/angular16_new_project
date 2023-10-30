@@ -75,13 +75,13 @@ export const appRoutes: Route[] = [
         },
         children: [
             {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')},
-            {path: 'revenus', loadChildren: () => import('app/modules/admin/revenus/revenus/revenus.routes')},
+            {path: 'income/list', loadChildren: () => import('app/modules/admin/revenus/revenus/revenus.routes')},
             {path: 'invoiceAdd', loadChildren: () => import('app/modules/admin/revenus/revenus/invoice-add/invoice-add.routes')},
             {path: 'requete', loadChildren: () => import('app/modules/admin/requete/requete.routes')},
             {path: 'invoiceDetail/:id', loadChildren: () => import('app/modules/admin/revenus/revenus/invoice-add/invoice-detail/invoice-detail.routes')},
             {path: 'invoiceList', loadChildren: () => import('app/modules/admin/revenus/revenus/invoice-list/invoice-list.routes')},
-            {path: 'invoiceSearch', loadChildren: () => import('app/modules/admin/revenus/search/income-search/income-search.routes')},
-            {path: 'facturation', loadChildren: () => import('app/modules/admin/revenus/revenus/facturation-revenus/facturation-revenus.routes')},
+            {path: 'income/search', loadChildren: () => import('app/modules/admin/revenus/search/income-search/income-search.routes')},
+            {path: 'income/invoice', loadChildren: () => import('app/modules/admin/revenus/revenus/facturation-revenus/facturation-revenus.routes')},
             {path: 'profile/:id', loadChildren: () => import('app/modules/admin/user-profile/user-profile.routes')},
         ]
     },

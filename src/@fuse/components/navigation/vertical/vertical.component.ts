@@ -16,6 +16,7 @@ import { FuseVerticalNavigationSpacerItemComponent } from '@fuse/components/navi
 import { FuseScrollbarDirective } from '@fuse/directives/scrollbar/scrollbar.directive';
 import { FuseUtilsService } from '@fuse/services/utils/utils.service';
 import { delay, filter, merge, ReplaySubject, Subject, Subscription, takeUntil } from 'rxjs';
+import {translate, TranslocoModule, TranslocoService} from "@ngneat/transloco";
 
 @Component({
     selector       : 'fuse-vertical-navigation',
@@ -26,7 +27,11 @@ import { delay, filter, merge, ReplaySubject, Subject, Subscription, takeUntil }
     changeDetection: ChangeDetectionStrategy.OnPush,
     exportAs       : 'fuseVerticalNavigation',
     standalone     : true,
-    imports        : [FuseScrollbarDirective, NgFor, NgIf, FuseVerticalNavigationAsideItemComponent, FuseVerticalNavigationBasicItemComponent, FuseVerticalNavigationCollapsableItemComponent, FuseVerticalNavigationDividerItemComponent, FuseVerticalNavigationGroupItemComponent, FuseVerticalNavigationSpacerItemComponent],
+    imports: [FuseScrollbarDirective, NgFor, NgIf,
+        FuseVerticalNavigationAsideItemComponent, FuseVerticalNavigationBasicItemComponent,
+        FuseVerticalNavigationCollapsableItemComponent, FuseVerticalNavigationDividerItemComponent,
+        FuseVerticalNavigationGroupItemComponent, FuseVerticalNavigationSpacerItemComponent, TranslocoModule
+    ],
 })
 export class FuseVerticalNavigationComponent implements OnChanges, OnInit, AfterViewInit, OnDestroy
 {
@@ -81,6 +86,7 @@ export class FuseVerticalNavigationComponent implements OnChanges, OnInit, After
         private _scrollStrategyOptions: ScrollStrategyOptions,
         private _fuseNavigationService: FuseNavigationService,
         private _fuseUtilsService: FuseUtilsService,
+        private TranslateService : TranslocoService
     )
     {
         this._handleAsideOverlayClick = (): void =>
@@ -307,6 +313,11 @@ export class FuseVerticalNavigationComponent implements OnChanges, OnInit, After
      */
     ngOnInit(): void
     {
+        for (let i = 0; i < this.navigation.length; i++) {
+            const key = this.navigation[i].title
+            const translationKey = `nav.${key.toUpperCase()}`;
+            this.TranslateService.translate(translationKey)
+        }
         // Make sure the name input is not an empty string
         if ( this.name === '' )
         {

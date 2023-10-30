@@ -80,6 +80,9 @@ export class AuthSignInComponent implements OnInit {
                 this.api || null,
                 Validators.required
             ],
+            display_id: [
+                this.display_id || null
+            ],
         });
         this.setLogo()
 
