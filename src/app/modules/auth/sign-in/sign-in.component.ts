@@ -54,11 +54,6 @@ export class AuthSignInComponent implements OnInit {
     submitted: boolean;
     api: string;
     display_id: string;
-
-    loginForm: FormGroup;
-
-    app_copyright: number;
-    app_version;
     logoUrl: string;
     constructor(
         private _activatedRoute: ActivatedRoute,
@@ -111,21 +106,11 @@ export class AuthSignInComponent implements OnInit {
                     if (res && res['token']) {
                         const user = res['user'];
 
-                        user.activeRoleIndex = 0;
-
-                        sessionStorage.setItem('logedIn', 'loged')
                         sessionStorage.setItem('token', res['token']);
                         sessionStorage.setItem('session', JSON.stringify({
                             user: user,
                             config: res['config']
                         }));
-
-                        /*let layout = 'bus'; // Par défaut
-                        if (formValue.api === 'https://api.capsule.mg/pascoma') {
-                            layout = 'hotel';
-                        }
-
-                        this.setLayout(layout)*/
 
                         Swal.fire({
                             toast: true,

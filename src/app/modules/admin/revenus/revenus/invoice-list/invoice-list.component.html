@@ -1,72 +1,71 @@
+<div class="flex justify-between">
+    <div class="form-group m-0 row">
 
-            <div class="flex justify-between">
-                <div class="form-group m-0 row">
+        <input (ngModelChange)="this.searchDescriptionUpdate.next($event)" [(ngModel)]="searchDescription"
+               class="form-control w-100 input-sm"
+               id="userQuestions" matInput name="userQuestion" placeholder="Recherche..."
+               type="search"
+        >
+    </div>
+    <button class="bg-blue-500 hover:bg-blue-700 pull-right text-white font-bold py-2 px-4 rounded"
+            routerLink="/invoiceAdd">Créer facture
+    </button>
+</div>
 
-                    <input (ngModelChange)="this.searchDescriptionUpdate.next($event)" [(ngModel)]="searchDescription"
-                           class="form-control w-100 input-sm"
-                           id="userQuestions" matInput name="userQuestion" placeholder="Recherche..."
-                           type="search"
-                    >
-                </div>
-                <button class="bg-blue-500 hover:bg-blue-700 pull-right text-white font-bold py-2 px-4 rounded"
-                        routerLink="/invoiceAdd">Créer facture
-                </button>
-            </div>
+<div class="mat-elevation-z8">
+    <table #sort="matSort" [dataSource]="data" mat-table matSort>
+        <!-- ID Column -->
+        <ng-container matColumnDef="Numero">
+            <th *matHeaderCellDef mat-header-cell> N:</th>
+            <td *matCellDef="let row" mat-cell><a [routerLink]="['/invoiceDetail', row.id]"
+                                                  href>{{row.id}}</a>
+            </td>
+        </ng-container>
 
-            <div class="mat-elevation-z8">
-                <table #sort="matSort" [dataSource]="data" mat-table matSort>
-                    <!-- ID Column -->
-                    <ng-container matColumnDef="Numero">
-                        <th *matHeaderCellDef mat-header-cell> N:</th>
-                        <td *matCellDef="let row" mat-cell><a [routerLink]="['/invoiceDetail', row.id]"
-                                                              href>{{row.id}}</a>
-                        </td>
-                    </ng-container>
+        <!-- Progress Column -->
+        <ng-container matColumnDef="contact">
+            <th *matHeaderCellDef mat-header-cell> Contact</th>
+            <td *matCellDef="let row" mat-cell> {{row.contact_name}} </td>
+        </ng-container>
 
-                    <!-- Progress Column -->
-                    <ng-container matColumnDef="contact">
-                        <th *matHeaderCellDef mat-header-cell> Contact</th>
-                        <td *matCellDef="let row" mat-cell> {{row.contact_name}} </td>
-                    </ng-container>
+        <!-- Name Column -->
+        <ng-container matColumnDef="reservation">
+            <th *matHeaderCellDef mat-header-cell> Reservation</th>
+            <td *matCellDef="let row" mat-cell> {{row.Reservation}} </td>
+        </ng-container>
 
-                    <!-- Name Column -->
-                    <ng-container matColumnDef="reservation">
-                        <th *matHeaderCellDef mat-header-cell> Reservation</th>
-                        <td *matCellDef="let row" mat-cell> {{row.Reservation}} </td>
-                    </ng-container>
+        <!-- Fruit Column -->
+        <ng-container matColumnDef="categorie">
+            <th *matHeaderCellDef mat-header-cell> Categorie</th>
+            <td *matCellDef="let row" mat-cell> {{row.Category.name}} </td>
+        </ng-container>
+        <ng-container matColumnDef="total">
+            <th *matHeaderCellDef mat-header-cell> Total</th>
+            <td *matCellDef="let row" mat-cell> {{row.amount}} </td>
+        </ng-container>
+        <ng-container matColumnDef="impaye">
+            <th *matHeaderCellDef mat-header-cell> Impayée</th>
+            <td *matCellDef="let row" mat-cell> {{row.balance}} </td>
+        </ng-container>
+        <ng-container matColumnDef="date_facture">
+            <th *matHeaderCellDef mat-header-cell> Facturée le</th>
+            <td *matCellDef="let row" mat-cell> {{row.invoiced_at | date: 'dd/MM/yyyy HH:mm'}} </td>
+        </ng-container>
+        <ng-container matColumnDef="creer_le">
+            <th *matHeaderCellDef mat-header-cell> Créer le</th>
+            <td *matCellDef="let row" mat-cell> {{row.created_at | date: 'dd/MM/yyyy HH:mm'}} </td>
+        </ng-container>
 
-                    <!-- Fruit Column -->
-                    <ng-container matColumnDef="categorie">
-                        <th *matHeaderCellDef mat-header-cell> Categorie</th>
-                        <td *matCellDef="let row" mat-cell> {{row.Category.name}} </td>
-                    </ng-container>
-                    <ng-container matColumnDef="total">
-                        <th *matHeaderCellDef mat-header-cell> Total</th>
-                        <td *matCellDef="let row" mat-cell> {{row.amount}} </td>
-                    </ng-container>
-                    <ng-container matColumnDef="impaye">
-                        <th *matHeaderCellDef mat-header-cell> Impayée</th>
-                        <td *matCellDef="let row" mat-cell> {{row.balance}} </td>
-                    </ng-container>
-                    <ng-container matColumnDef="date_facture">
-                        <th *matHeaderCellDef mat-header-cell> Facturée le</th>
-                        <td *matCellDef="let row" mat-cell> {{row.invoiced_at | date: 'dd/MM/yyyy HH:mm'}} </td>
-                    </ng-container>
-                    <ng-container matColumnDef="creer_le">
-                        <th *matHeaderCellDef mat-header-cell> Créer le</th>
-                        <td *matCellDef="let row" mat-cell> {{row.created_at | date: 'dd/MM/yyyy HH:mm'}} </td>
-                    </ng-container>
+        <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+        <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
 
-                    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-                    <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+        <ng-container *matNoDataRow>
+            <tr>
+                <td colspan="{{ displayedColumns.length }}">Aucun enregistrement</td>
+            </tr>
+        </ng-container>
 
-                    <ng-container *matNoDataRow>
-                        <tr>
-                            <td colspan="{{ displayedColumns.length }}" >Aucun enregistrement</td>
-                        </tr>
-                    </ng-container>
-
-                </table>
-                <mat-paginator [length]="resultsLength" [pageSize]="size"
-                               aria-label="Select page of GitHub search results"></mat-paginator>
-            </div>
+    </table>
+    <mat-paginator [length]="resultsLength" [pageSize]="size"
+                   aria-label="Select page of GitHub search results"></mat-paginator>
+</div>

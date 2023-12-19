@@ -37,6 +37,7 @@ export class AuthentificationService {
     logout() {
         sessionStorage.clear();
         this._authenticated = true;
+        sessionStorage.clear()
         this.router.navigate(['/']);
     }
 

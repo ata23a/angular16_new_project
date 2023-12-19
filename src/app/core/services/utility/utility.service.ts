@@ -49,7 +49,6 @@ export class UtilityService {
             hour: 12,
             minute: 0
         });
-
         return cT;
     };
 

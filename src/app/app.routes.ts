@@ -83,6 +83,8 @@ export const appRoutes: Route[] = [
             {path: 'income/search', loadChildren: () => import('app/modules/admin/revenus/search/income-search/income-search.routes')},
             {path: 'income/invoice', loadChildren: () => import('app/modules/admin/revenus/revenus/facturation-revenus/facturation-revenus.routes')},
             {path: 'profile/:id', loadChildren: () => import('app/modules/admin/user-profile/user-profile.routes')},
+            {path: 'settings/role', loadChildren: () => import('app/modules/admin/settings/role/role.routes')},
+            {path: 'edit/:id', loadChildren: () => import('app/modules/admin/settings/role/role-edit/role-edit.routes')},
         ]
     },
 ];
